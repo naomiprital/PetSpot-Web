@@ -1,4 +1,4 @@
-import Post from '@/models/post';
+import Post from '@/models/postModel';
 
 const getPosts = async () => {
   return await Post.find();

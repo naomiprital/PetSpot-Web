@@ -32,3 +32,16 @@ Content-Type: application/json
   "isResolved": false,
   "description": "Updated description: Brown cat with a blue collar"
 }
+
+###
+GET http://localhost:8080/comment
+
+###
+POST http://localhost:8080/comment
+Content-Type: application/json
+
+{
+  "postId": "6973b549af0a8aecb3307bbc",
+  "commenter": "Yuval",
+  "commentText": "I think I saw this cat near the park."
+}

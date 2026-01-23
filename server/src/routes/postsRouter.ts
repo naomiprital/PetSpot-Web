@@ -3,9 +3,9 @@ import { Router } from 'express';
 
 const postsRouter = Router();
 
-postsRouter.get('/', postsController.getPosts);
-postsRouter.post('/', postsController.createPost);
-postsRouter.get('/:id', postsController.getPostById);
-postsRouter.put('/:id', postsController.updatePost);
+postsRouter.get('/', postsController.getPosts.bind(postsController));
+postsRouter.post('/', postsController.createPost.bind(postsController));
+postsRouter.get('/:id', postsController.getPostById.bind(postsController));
+postsRouter.put('/:id', postsController.updatePost.bind(postsController));
 
 export default postsRouter;
