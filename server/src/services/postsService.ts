@@ -18,7 +18,7 @@ const getPostsBySender = async (sender: string) => {
 };
 
 const updatePost = async (id: string, updateData: Partial<typeof Post>) => {
-  return await Post.findByIdAndUpdate(id, updateData, { new: true });
+  return await Post.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
 }
 
 export default {

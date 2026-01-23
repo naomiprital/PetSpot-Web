@@ -3,10 +3,9 @@ import { Router } from 'express';
 
 const commentsRouter = Router();
 
-commentsRouter.get('/', commentsController.getComments.bind(commentsController));
-commentsRouter.post('/', commentsController.createComment.bind(commentsController));
-// todo: commentsRouter.get('/:id', commentsController.getCommentById.bind(commentsController));
-// todo: commentsRouter.put('/:id', commentsController.updateComment.bind(commentsController));
-// todo: commentsRouter.delete('/:id', commentsController.deleteComment.bind(commentsController));
-
+commentsRouter.get('/', commentsController.getComments);
+commentsRouter.post('/', commentsController.createComment);
+// todo: commentsRouter.get('/:id', commentsController.getCommentById);
+// todo: commentsRouter.put('/:id', commentsController.updateComment);
+// todo: commentsRouter.delete('/:id', commentsController.deleteComment);
 export default commentsRouter;

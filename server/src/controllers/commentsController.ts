@@ -14,7 +14,7 @@ const getComments = async (req: Request, res: Response) => {
   const createComment = async (req: Request, res: Response) => {
     try {
       const comment = await commentsService.createComment(req.body);
-      res.status(200).json(comment);
+      res.status(201).json(comment);
     } catch (error) {
       console.error('Error creating comment:', error);
       res.status(500).json({ message: 'Internal server error' });

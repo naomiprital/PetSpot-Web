@@ -25,7 +25,7 @@ GET  http://localhost:8080/post/6973b549af0a8aecb3307bbc
 GET  http://localhost:8080/post?sender=Naomi
 
 ###
-PUT http://localhost:8080/post/6973b549af0a8aecb3307bbc
+PATCH http://localhost:8080/post/6973b549af0a8aecb3307bbc
 Content-Type: application/json
 
 {
@@ -37,7 +37,7 @@ Content-Type: application/json
 GET http://localhost:8080/comment
 
 ###
-POST http://localhost:8080/comment
+PATCH http://localhost:8080/comment
 Content-Type: application/json
 
 {
