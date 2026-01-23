@@ -1,0 +1,34 @@
+###
+GET http://localhost:8080/post
+
+###
+POST http://localhost:8080/post
+Content-Type: application/json
+
+{
+  "sender": "Naomi",
+  "type": "found",
+  "animalType": "cat",
+  "location": {
+    "type": "Point",
+    "coordinates": [32.7818, 34.0853]
+  },
+  "dateTimeOccured": "2025-06-15T10:30:00Z",
+  "description": "Brown cat with a red collar",
+  "isResolved": true
+}
+
+###
+GET  http://localhost:8080/post/6973b549af0a8aecb3307bbc
+
+###
+GET  http://localhost:8080/post?sender=Naomi
+
+###
+PUT http://localhost:8080/post/6973b549af0a8aecb3307bbc
+Content-Type: application/json
+
+{
+  "isResolved": false,
+  "description": "Updated description: Brown cat with a blue collar"
+}
