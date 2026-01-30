@@ -7,7 +7,7 @@ commentsRouter.get('/', commentsController.getComments);
 commentsRouter.post('/', commentsController.createComment);
 commentsRouter.get('/:id', commentsController.getCommentById);
 commentsRouter.get('/post/:postId', commentsController.getCommentsByPostId);
-commentsRouter.patch('/:id', commentsController.updateComment);
+commentsRouter.put('/:id', commentsController.updateComment);
 commentsRouter.delete('/:id', commentsController.deleteComment);
 
 export default commentsRouter;
