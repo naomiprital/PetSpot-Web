@@ -6,26 +6,29 @@ POST http://localhost:8080/posts
 Content-Type: application/json
 
 {
-  "sender": "Yuval",
-  "type": "found",
-  "animalType": "dog",
+  "sender": "Naomi",
+  "type": "lost",
+  "animalType": "hamster",
   "location": {
     "type": "Point",
     "coordinates": [12.345, 67.890]
   },
-  "dateTimeOccured": "2026-01-30T14:00:00Z",
-  "description": "White dog with a black collar",
-  "isResolved": true
+  "dateTimeOccured": "2026-01-16T14:00:00Z",
+  "description": "Hamster with a red bow tie.",
+  "isResolved": false,
+  "photos": [
+    "https://placedog.net/600"
+  ]
 }
 
 ###
-GET  http://localhost:8080/posts/697cac6c7e62586c69ef4965
+GET http://localhost:8080/posts/697cda4d909448ce1d1d6681
 
 ###
-GET  http://localhost:8080/posts?sender=Yuval
+GET http://localhost:8080/posts?sender=Naomi
 
 ###
-PUT http://localhost:8080/posts/697cac6c7e62586c69ef4965
+PUT http://localhost:8080/posts/6962b723b6737e046a1aaa33
 Content-Type: application/json
 
 {
@@ -37,8 +40,11 @@ Content-Type: application/json
     "coordinates": [67.890, 12.345]
   },
   "dateTimeOccured": "2026-01-30T14:00:00Z",
-  "description": "White bird",
-  "isResolved": false
+  "description": "Editing: Actually it was a white bird, not a dog.",
+  "isResolved": false,
+  "photos": [
+    "https://placedog.net/500"
+  ]
 }
 
 ###

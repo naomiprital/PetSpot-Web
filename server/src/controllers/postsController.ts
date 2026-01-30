@@ -28,11 +28,12 @@ const getPostById = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
     const post = await postsService.getPostById(id as string);
+
     if (!post) {
-      res.status(404).send('Movie not found');
-    } else {
-      res.status(200).json(post);
+      return res.status(404).send('Post not found');
     }
+
+    res.status(200).json(post);
   } catch (error) {
     console.error('Error fetching post:', error);
     res.status(500).json({ message: 'Internal server error' });
@@ -43,6 +44,11 @@ const updatePost = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
     const updatedPost = await postsService.updatePost(id as string, req.body);
+
+    if (!updatedPost) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
     res.status(200).json(updatedPost);
   } catch (error) {
     console.error('Error updating post:', error);
