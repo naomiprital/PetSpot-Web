@@ -11,11 +11,11 @@ export const ANIMAL_TYPES = [
 ] as const;
 export const POST_TYPES = ['lost', 'found'] as const;
 
-export type AnimalType = (typeof ANIMAL_TYPES)[number];
-export type PostType = (typeof POST_TYPES)[number];
+type AnimalType = (typeof ANIMAL_TYPES)[number];
+type PostType = (typeof POST_TYPES)[number];
 
 export interface Post {
-  _id?: ObjectId | string;
+  _id: ObjectId | string;
   sender: string;
   type: PostType;
   animalType: AnimalType;
