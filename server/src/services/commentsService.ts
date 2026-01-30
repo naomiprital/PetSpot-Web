@@ -9,7 +9,12 @@ const createComment = async (commentData: Partial<typeof Comment>) => {
   return await newComment.save();
 };
 
+const getCommentById = async (id: string) => {
+  return await Comment.findById(id);
+};
+
 export default {
   getComments,
   createComment,
+  getCommentById,
 };
