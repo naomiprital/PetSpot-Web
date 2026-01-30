@@ -1,6 +1,7 @@
+import { ANIMAL_TYPES, Post, POST_TYPES } from '@/types/post';
 import mongoose from 'mongoose';
 
-const postSchema = new mongoose.Schema(
+const postSchema = new mongoose.Schema<Post>(
   {
     sender: {
       type: String,
@@ -8,13 +9,13 @@ const postSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ['lost', 'found'],
+      enum: POST_TYPES,
       required: true,
     },
     animalType: {
       type: String,
       required: true,
-      enum: ['dog', 'cat', 'bird', 'rabbit', 'hamster', 'horse', 'other'],
+      enum: ANIMAL_TYPES,
     },
     location: {
       type: {
@@ -37,11 +38,14 @@ const postSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    photos: {
+        type: [String],
+        default: []
+    },
     isResolved: {
       type: Boolean,
       default: false,
     },
-    // todo: images
   },
   { timestamps: true }
 );
