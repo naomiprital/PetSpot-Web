@@ -1,20 +1,20 @@
 ###
-GET http://localhost:8080/posts
+GET http://localhost:8080/post
 
 ###
-POST http://localhost:8080/posts
+POST http://localhost:8080/post
 Content-Type: application/json
 
 {
-  "sender": "Naomi",
+  "sender": "Yuval",
   "type": "lost",
-  "animalType": "hamster",
+  "animalType": "horse",
   "location": {
     "type": "Point",
     "coordinates": [12.345, 67.890]
   },
-  "dateTimeOccured": "2026-01-16T14:00:00Z",
-  "description": "Hamster with a red bow tie.",
+  "dateTimeOccured": "2026-01-17T14:00:00Z",
+  "description": "Horse with a red bow tie.",
   "isResolved": false,
   "photos": [
     "https://placedog.net/600"
@@ -22,25 +22,25 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:8080/posts/697cda4d909448ce1d1d6681
+GET http://localhost:8080/post/697cea427a339ea2dda762d5
 
 ###
-GET http://localhost:8080/posts?sender=Naomi
+GET http://localhost:8080/post?sender=Yuval
 
 ###
-PUT http://localhost:8080/posts/6962b723b6737e046a1aaa33
+PUT http://localhost:8080/post/697cea427a339ea2dda762d5
 Content-Type: application/json
 
 {
   "sender": "Yuval",
   "type": "found",
-  "animalType": "bird",
+  "animalType": "horse",
   "location": {
     "type": "Point",
     "coordinates": [67.890, 12.345]
   },
-  "dateTimeOccured": "2026-01-30T14:00:00Z",
-  "description": "Editing: Actually it was a white bird, not a dog.",
+  "dateTimeOccured": "2026-01-12T14:00:00Z",
+  "description": "Editing: Actually the bow was pink.",
   "isResolved": false,
   "photos": [
     "https://placedog.net/500"
@@ -48,31 +48,31 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:8080/comments
+GET http://localhost:8080/comment
 
 ###
-GET http://localhost:8080/comments?postId=697cac6c7e62586c69ef4965
+GET http://localhost:8080/comment?postId=697cac6c7e62586c69ef4965
 
 ###
-GET http://localhost:8080/comments/697cce6664aa66305322b225
+GET http://localhost:8080/comment/697cdf229c5395dfa9477955
 
 ###
-POST  http://localhost:8080/comments
+POST  http://localhost:8080/comment
 Content-Type: application/json
 
 {
   "postId": "697cac6c7e62586c69ef4965",
-  "sender": "Naomi",
-  "commentText": "I think I saw this bird near the park."
+  "sender": "Yuval",
+  "commentText": "I saw the horse on the road."
 }
 
 ###
-PUT http://localhost:8080/comments/697cdf229c5395dfa9477955
+PUT http://localhost:8080/comment/697ceac87a339ea2dda762e3
 Content-Type: application/json
 
 {
-  "commentText": "Editing: Actually, looking closer, I think it is a different species."
+  "commentText": "Editing: I saw the horse on the road: The road is Derech Ben Gurion."
 }
 
 ###
-DELETE http://localhost:8080/comments/697cce6664aa66305322b225
+DELETE http://localhost:8080/comment/697ceac87a339ea2dda762e3
