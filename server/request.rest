@@ -6,31 +6,39 @@ POST http://localhost:8080/post
 Content-Type: application/json
 
 {
-  "sender": "Naomi",
+  "sender": "Yuval",
   "type": "found",
-  "animalType": "cat",
+  "animalType": "dog",
   "location": {
     "type": "Point",
-    "coordinates": [32.7818, 34.0853]
+    "coordinates": [12.345, 67.890]
   },
-  "dateTimeOccured": "2025-06-15T10:30:00Z",
-  "description": "Brown cat with a red collar",
+  "dateTimeOccured": "2026-01-30T14:00:00Z",
+  "description": "White dog with a black collar",
   "isResolved": true
 }
 
 ###
-GET  http://localhost:8080/post/6973b549af0a8aecb3307bbc
+GET  http://localhost:8080/post/697cac6c7e62586c69ef4965
 
 ###
-GET  http://localhost:8080/post?sender=Naomi
+GET  http://localhost:8080/post?sender=Yuval
 
 ###
-PATCH http://localhost:8080/post/6973b549af0a8aecb3307bbc
+PUT http://localhost:8080/post/697cac6c7e62586c69ef4965
 Content-Type: application/json
 
 {
-  "isResolved": false,
-  "description": "Updated description: Brown cat with a blue collar"
+  "sender": "Yuval",
+  "type": "found",
+  "animalType": "bird",
+  "location": {
+    "type": "Point",
+    "coordinates": [67.890, 12.345]
+  },
+  "dateTimeOccured": "2026-01-30T14:00:00Z",
+  "description": "White bird",
+  "isResolved": false
 }
 
 ###
