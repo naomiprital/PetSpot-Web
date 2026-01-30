@@ -45,7 +45,7 @@ Content-Type: application/json
 GET http://localhost:8080/comments
 
 ###
-GET http://localhost:8080/comments/697cb22da80799c525c1232a
+GET http://localhost:8080/comments/697cce6664aa66305322b225
 
 ###
 POST  http://localhost:8080/comments
@@ -56,3 +56,17 @@ Content-Type: application/json
   "sender": "Naomi",
   "commentText": "I think I saw this bird near the park."
 }
+
+###
+GET http://localhost:8080/comments/post/697cac6c7e62586c69ef4965
+
+###
+PATCH http://localhost:8080/comments/697cce6664aa66305322b225
+Content-Type: application/json
+
+{
+  "commentText": "Actually, looking closer, I think it is a different species."
+}
+
+###
+DELETE http://localhost:8080/comments/697cce6664aa66305322b225
