@@ -6,7 +6,7 @@ const commentsRouter = Router();
 
 /**
  * @swagger
- * /components:
+ * /comments:
  *   get:
  *     tags: [Comments]
  *     summary: Retrieve all comments
@@ -33,7 +33,7 @@ commentsRouter.get('/', commentsController.getComments);
 
 /**
  * @swagger
- * /components/{id}:
+ * /comments/{id}:
  *   get:
  *     tags: [Comments]
  *     summary: Retrieve a single comment
@@ -88,8 +88,156 @@ commentsRouter.get('/', commentsController.getComments);
  *               message: "An unexpected error occurred"
  */
 commentsRouter.get('/:id', commentsController.getCommentById);
+
+/**
+ * @swagger
+ * /comments:
+ *   post:
+ *     tags: [Comments]
+ *     summary: Create a new comment
+ *     description: Create a new comment
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Comment'
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: Comment created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Comment'
+ *       400:
+ *         description: Invalid request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             examples:
+ *               message: "Invalid comment data"
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             examples:
+ *               message: "Unauthorized access"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             examples:
+ *               message: "An unexpected error occurred"
+ */
 commentsRouter.post('/', authMiddleware, commentsController.createComment);
+
+/**
+ * @swagger
+ * /comments/{id}:
+ *   put:
+ *     tags: [Comments]
+ *     summary: Update a comment
+ *     description: Update a comment by its ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the comment to update
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Comment'
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Comment updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Comment'
+ *       400:
+ *         description: Invalid request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             examples:
+ *               message: "Invalid comment data"
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             examples:
+ *               message: "Unauthorized access"
+ *       404:
+ *         description: Comment not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             examples:
+ *               message: "Comment not found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             examples:
+ *               message: "An unexpected error occurred"
+ */
 commentsRouter.put('/:id', authMiddleware, commentsController.updateComment);
+
+/**
+ * @swagger
+ * /comments/{id}:
+ *   delete:
+ *     tags: [Comments]
+ *     summary: Delete a comment
+ *     description: Delete a comment by its ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the comment to delete
+ *         schema:
+ *           type: string
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       204:
+ *         description: Comment deleted successfully
+ *       404:
+ *         description: Comment not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             examples:
+ *               message: "Comment not found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             examples:
+ *               message: "An unexpected error occurred"
+ */
 commentsRouter.delete('/:id', authMiddleware, commentsController.deleteComment);
 
 export default commentsRouter;
