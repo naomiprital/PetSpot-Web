@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 import request from 'supertest';
 import { getLogedInUser, testPost, UserData } from './utils';
 import app from '../../index';
-import { log } from 'node:console';
 
 let loginUser: UserData;
 
@@ -11,6 +10,7 @@ beforeAll(async () => {
     await mongoose.connect(process.env.DATABASE_URL as string);
   }
   loginUser = await getLogedInUser(app);
+  testPost.sender = loginUser._id;
 });
 
 afterAll(async () => {

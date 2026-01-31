@@ -41,11 +41,10 @@ export const getLogedInUser = async (app: Express): Promise<UserData> => {
   let response = await request(app)
     .post('/auth/register')
     .send({ email: email, password: password, username: username });
-  if (response.status !== 201) {
-    response = await request(app)
-      .post('/auth/login')
-      .send({ email: email, password: password });
-  }
+  response = await request(app)
+    .post('/auth/login')
+    .send({ email: email, password: password });
+
   const logedUser = {
     _id: response.body._id,
     token: response.body.token,
