@@ -129,6 +129,7 @@ authRouter.post('/logout', authController.logout);
  *     tags: [Authentication]
  *     summary: Refresh a user's JWT token
  *     description: Generate a new JWT token using the refresh token
+ *     security: []
  *     requestBody:
  *       required: true
  *       content:
