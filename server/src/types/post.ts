@@ -16,7 +16,7 @@ type PostType = (typeof POST_TYPES)[number];
 
 export interface Post {
   _id?: ObjectId | string;
-  sender: string;
+  sender: ObjectId | string;
   type: PostType;
   animalType: AnimalType;
   location: {

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import commentsService from '@/services/commentsService';
+import { AuthRequest } from '@/middlewares/authMiddleware';
 
 const getComments = async (req: Request, res: Response) => {
   try {
@@ -16,9 +17,13 @@ const getComments = async (req: Request, res: Response) => {
   }
 };
 
-const createComment = async (req: Request, res: Response) => {
+const createComment = async (req: AuthRequest, res: Response) => {
   try {
-    const comment = await commentsService.createComment(req.body);
+    const userId = req.user?._id;
+    const comment = await commentsService.createComment({
+      ...req.body,
+      sender: userId,
+    });
     res.status(201).json(comment);
   } catch (error) {
     console.error('Error creating comment:', error);
@@ -40,19 +45,24 @@ const getCommentById = async (req: Request, res: Response) => {
   }
 };
 
-const updateComment = async (req: Request, res: Response) => {
+const updateComment = async (req: AuthRequest, res: Response) => {
   try {
-    const commentId = req.params.id;
-    const updatedData = req.body;
-    const updatedComment = await commentsService.updateComment(
-      commentId as string,
-      updatedData
-    );
+    const commentId = req.params.id as string;
+    const userId = req.user?._id;
 
-    if (!updatedComment) {
+    const comment = await commentsService.getCommentById(commentId);
+    if (!comment) {
       return res.status(404).json({ message: 'Comment not found' });
     }
 
+    if (comment.sender.toString() !== userId) {
+      return res.status(403).json({ message: 'You cannot edit this comment' });
+    }
+
+    const updatedComment = await commentsService.updateComment(
+      commentId,
+      req.body
+    );
     res.status(200).json(updatedComment);
   } catch (error) {
     console.error('Error updating comment:', error);
@@ -60,18 +70,24 @@ const updateComment = async (req: Request, res: Response) => {
   }
 };
 
-const deleteComment = async (req: Request, res: Response) => {
+const deleteComment = async (req: AuthRequest, res: Response) => {
   try {
-    const commentId = req.params.id;
-    const deletedComment = await commentsService.deleteComment(
-      commentId as string
-    );
+    const commentId = req.params.id as string;
+    const userId = req.user?._id;
 
-    if (!deletedComment) {
+    const comment = await commentsService.getCommentById(commentId);
+    if (!comment) {
       return res.status(404).json({ message: 'Comment not found' });
     }
 
-    res.status(200).json(deletedComment);
+    if (comment.sender.toString() !== userId) {
+      return res
+        .status(403)
+        .json({ message: 'You cannot delete this comment' });
+    }
+
+    await commentsService.deleteComment(commentId);
+    res.status(200).json({ message: 'Comment deleted successfully' });
   } catch (error) {
     console.error('Error deleting comment:', error);
     res.status(500).json({ message: 'Internal server error' });
