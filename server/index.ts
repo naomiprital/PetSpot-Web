@@ -4,8 +4,8 @@ import dotenv from 'dotenv';
 import connectDB from './src/config/connect';
 import router from '@/routes/router';
 
-dotenv.config({ path: '.env.dev' });
-
+const envFile = process.env.NODE_ENV === 'test' ? '.env.test' : '.env.dev';
+dotenv.config({ path: envFile });
 const app = express();
 const port = process.env.PORT || 8080;
 
@@ -19,6 +19,10 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Hello, World!');
 });
 
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(port, () => {
+    console.log(`Server running on http://localhost:${port}`);
+  });
+}
+
+export default app;
