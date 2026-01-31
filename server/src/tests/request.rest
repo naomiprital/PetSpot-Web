@@ -1,78 +1,100 @@
-###
-GET http://localhost:8080/post
 
-###
+### 1. Register a New User
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+    "email": "goodguy@test.com",
+    "password": "password123",
+    "username": "GoodGuy"
+}
+
+### 2. Login as GoodGuy
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+    "email": "goodguy@test.com",
+    "password": "password123"
+}
+
+### 3. Logout (Requires Refresh Token)
+POST http://localhost:8080/auth/logout
+Content-Type: application/json
+
+{
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTdkZmRkM2QxYzRiOGFmNzM0ZTEwNWIiLCJpYXQiOjE3Njk4NjQ2NjcsImV4cCI6MTc2OTg2ODI2N30.YuEGTrMSB_6ymOxmCQ-kFJc7CZaSd5p2-t3GmtSufUU"
+}
+### 4. Test logout by refreshing token (Should Fail)
+POST http://localhost:8080/auth/refresh-token
+Content-Type: application/json
+
+{
+    "refreshToken": "eeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTdkZmRkM2QxYzRiOGFmNzM0ZTEwNWIiLCJpYXQiOjE3Njk4NjQ2NjcsImV4cCI6MTc2OTg2ODI2N30.YuEGTrMSB_6ymOxmCQ-kFJc7CZaSd5p2-t3GmtSufUU"
+}
+
+### 4. Get GoodGuy's Profile
+GET http://localhost:8080/user/697dfdd3d1c4b8af734e105b
+
+### 5. Update GoodGuy's Profile
+PUT http://localhost:8080/user/697dfdd3d1c4b8af734e105b
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTdkZmRkM2QxYzRiOGFmNzM0ZTEwNWIiLCJpYXQiOjE3Njk4NjQ3OTQsImV4cCI6MTc2OTg2ODM5NH0.uYmE3FQpuLelBEmgAHRBnx6zWzCb0sh0FJrnKDAFw_U
+
+{
+    "username": "GoodGuy Updated"
+}
+
+### 6. Create a Post
 POST http://localhost:8080/post
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTdkZmRkM2QxYzRiOGFmNzM0ZTEwNWIiLCJpYXQiOjE3Njk4NjQ3OTQsImV4cCI6MTc2OTg2ODM5NH0.uYmE3FQpuLelBEmgAHRBnx6zWzCb0sh0FJrnKDAFw_U
 
 {
-  "sender": "Yuval",
-  "type": "lost",
-  "animalType": "horse",
-  "location": {
-    "type": "Point",
-    "coordinates": [12.345, 67.890]
-  },
-  "dateTimeOccured": "2026-01-17T14:00:00Z",
-  "description": "Horse with a red bow tie.",
-  "isResolved": false,
-  "photos": [
-    "https://placedog.net/600"
-  ]
+    "title": "Found Dog",
+    "type": "found",
+    "animalType": "dog",
+    "location": { "type": "Point", "coordinates": [32.0853, 34.7818] },
+    "dateTimeOccured": "2026-01-31",
+    "description": "Cute puppy found near the park"
 }
 
-###
-GET http://localhost:8080/post/697cea427a339ea2dda762d5
+### 6.5. Get all posts (To find the ID)
+GET http://localhost:8080/post
 
-###
-GET http://localhost:8080/post?sender=Yuval
+### 7. Update your Post
+PUT http://localhost:8080/post/697dfe79d1c4b8af734e106a
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTdkZmRkM2QxYzRiOGFmNzM0ZTEwNWIiLCJpYXQiOjE3Njk4NjQ3OTQsImV4cCI6MTc2OTg2ODM5NH0.uYmE3FQpuLelBEmgAHRBnx6zWzCb0sh0FJrnKDAFw_U
 
-###
-PUT http://localhost:8080/post/697cea427a339ea2dda762d5
+{
+    "description": "Update: The owner was found!"
+}
+
+### 8. Register a "BadGuy"
+POST http://localhost:8080/auth/register
 Content-Type: application/json
 
 {
-  "sender": "Yuval",
-  "type": "found",
-  "animalType": "horse",
-  "location": {
-    "type": "Point",
-    "coordinates": [67.890, 12.345]
-  },
-  "dateTimeOccured": "2026-01-12T14:00:00Z",
-  "description": "Editing: Actually the bow was pink.",
-  "isResolved": false,
-  "photos": [
-    "https://placedog.net/500"
-  ]
+    "email": "badguy@test.com",
+    "password": "123",
+    "username": "BadGuy"
 }
 
-###
-GET http://localhost:8080/comment
-
-###
-GET http://localhost:8080/comment?postId=697cac6c7e62586c69ef4965
-
-###
-GET http://localhost:8080/comment/697cdf229c5395dfa9477955
-
-###
-POST  http://localhost:8080/comment
+### 9. Login as BadGuy (To get his token)
+POST http://localhost:8080/auth/login
 Content-Type: application/json
 
 {
-  "postId": "697cac6c7e62586c69ef4965",
-  "sender": "Yuval",
-  "commentText": "I saw the horse on the road."
+    "email": "badguy@test.com",
+    "password": "123"
 }
 
-###
-PUT http://localhost:8080/comment/697ceac87a339ea2dda762e3
+### 10. BadGuy tries to DELETE GoodGuy's Post/Comment
+PUT http://localhost:8080/post/697dfe79d1c4b8af734e106a
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTdkZmUyOWQxYzRiOGFmNzM0ZTEwNjIiLCJpYXQiOjE3Njk4NjQ4ODUsImV4cCI6MTc2OTg2ODQ4NX0.hGJOxHUKOfosoQwXLWh2rNgdbmUR5UDTxQ6pdLtWFaQ
 
 {
-  "commentText": "Editing: I saw the horse on the road: The road is Derech Ben Gurion."
+    "description": "I AM HACKING YOU"
 }
-
-###
-DELETE http://localhost:8080/comment/697ceac87a339ea2dda762e3

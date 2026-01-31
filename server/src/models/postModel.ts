@@ -4,7 +4,8 @@ import mongoose from 'mongoose';
 const postSchema = new mongoose.Schema<Post>(
   {
     sender: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
       required: true,
     },
     type: {
@@ -39,8 +40,8 @@ const postSchema = new mongoose.Schema<Post>(
       required: false,
     },
     photos: {
-        type: [String],
-        default: []
+      type: [String],
+      default: [],
     },
     isResolved: {
       type: Boolean,
