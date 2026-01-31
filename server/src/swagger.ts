@@ -1,6 +1,6 @@
-import e from 'express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import { ANIMAL_TYPES, POST_TYPES } from './types/post';
 
 const options: swaggerJsdoc.Options = {
   definition: {
@@ -82,15 +82,7 @@ const options: swaggerJsdoc.Options = {
             },
             animalType: {
               type: 'string',
-              enum: [
-                'dog',
-                'cat',
-                'bird',
-                'rabbit',
-                'hamster',
-                'horse',
-                'other',
-              ],
+              enum: ANIMAL_TYPES,
               description: 'Type of animal',
               example: 'dog',
             },
@@ -123,7 +115,7 @@ const options: swaggerJsdoc.Options = {
             },
             type: {
               type: 'string',
-              enum: ['lost', 'found'],
+              enum: POST_TYPES,
               description: 'Type of the post',
               example: 'found',
             },

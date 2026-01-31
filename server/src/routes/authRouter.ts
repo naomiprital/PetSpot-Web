@@ -10,6 +10,7 @@ const authRouter = express.Router();
  *     tags: [Authentication]
  *     summary: Register a new user
  *     description: Create a new user account with email and password
+ *     security: []
  *     requestBody:
  *       required: true
  *       content:
@@ -29,8 +30,8 @@ const authRouter = express.Router();
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
- *              examples:
- *                    message: "Invalid email or password"
+ *             examples:
+ *               message: "Invalid email or password"
  *       409:
  *         description: User already exists
  *         content:
