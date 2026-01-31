@@ -21,7 +21,7 @@ app.use(
   swaggerUi.setup(swaggerSpec, {
     explorer: true,
     customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: 'Movies & Comments API Documentation',
+    customSiteTitle: 'PetSpot API Documentation',
   })
 );
 

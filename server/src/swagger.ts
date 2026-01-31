@@ -1,3 +1,4 @@
+import e from 'express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
@@ -5,18 +6,18 @@ const options: swaggerJsdoc.Options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Movies & Comments API',
+      title: 'PetSpot REST API',
       version: '1.0.0',
       description:
-        'A RESTful API for managing movies and comments with user authentication',
+        'A REST API for managing PetSpot app, including posts, comments and user authentication.',
       contact: {
-        name: 'Menachi',
-        email: 'developer@example.com',
+        name: 'PetSpot Team',
+        email: 'PetSpot@gmail.com',
       },
     },
     servers: [
       {
-        url: `http://localhost:${process.env.PORT || 3000}`,
+        url: process.env.BASE_URL || 'http://localhost:3000',
         description: 'Development server',
       },
     ],
@@ -26,44 +27,18 @@ const options: swaggerJsdoc.Options = {
           type: 'http',
           scheme: 'bearer',
           bearerFormat: 'JWT',
-          description: 'Enter JWT Bearer token',
+          description: 'JWT authorization header using the Bearer scheme',
         },
       },
       schemas: {
-        Movie: {
-          type: 'object',
-          required: ['title', 'year'],
-          properties: {
-            _id: {
-              type: 'string',
-              description: 'Movie ID (MongoDB ObjectId)',
-              example: '507f1f77bcf86cd799439011',
-            },
-            title: {
-              type: 'string',
-              description: 'Movie title',
-              example: 'The Matrix',
-            },
-            year: {
-              type: 'number',
-              description: 'Release year',
-              example: 1999,
-            },
-            creatredBy: {
-              type: 'string',
-              description: 'ID of the user who created the movie',
-              example: '507f1f77bcf86cd799439012',
-            },
-          },
-        },
         User: {
           type: 'object',
-          required: ['email', 'password'],
+          required: ['email', 'username', 'password'],
           properties: {
             _id: {
               type: 'string',
-              description: 'User ID (MongoDB ObjectId)',
-              example: '507f1f77bcf86cd799439012',
+              description: 'User unique identifier',
+              example: '507f1f77bcf86cd799439011',
             },
             email: {
               type: 'string',
@@ -71,36 +46,142 @@ const options: swaggerJsdoc.Options = {
               description: 'User email address',
               example: 'user@example.com',
             },
+            username: {
+              type: 'string',
+              description: 'User username',
+              example: 'petlover123',
+            },
             password: {
               type: 'string',
-              description: 'User password (hashed)',
+              minLength: 6,
+              description: 'User password (hashed when stored)',
               example: 'password123',
+            },
+          },
+        },
+        Post: {
+          type: 'object',
+          required: [
+            'sender',
+            'type',
+            'animalType',
+            'description',
+            'location',
+            'dateTimeOccured',
+          ],
+          properties: {
+            _id: {
+              type: 'string',
+              description: 'Post unique identifier',
+              example: '507f1f77bcf86cd799439011',
+            },
+            sender: {
+              type: 'string',
+              description: 'ID of the user who created this post',
+              example: '507f1f77bcf86cd799439011',
+            },
+            animalType: {
+              type: 'string',
+              enum: [
+                'dog',
+                'cat',
+                'bird',
+                'rabbit',
+                'hamster',
+                'horse',
+                'other',
+              ],
+              description: 'Type of animal',
+              example: 'dog',
+            },
+            location: {
+              type: 'object',
+              required: ['type', 'coordinates'],
+              properties: {
+                type: {
+                  type: 'string',
+                  enum: ['Point'],
+                  description: 'GeoJSON type',
+                  example: 'Point',
+                },
+                coordinates: {
+                  type: 'array',
+                  items: {
+                    type: 'number',
+                  },
+                  minItems: 2,
+                  maxItems: 2,
+                  description: 'GeoJSON coordinates',
+                  example: [102.0, 0.5],
+                },
+                address: {
+                  type: 'string',
+                  description: 'Human-readable address',
+                  example: '123 Pet Street, Pet City, PC 12345',
+                },
+              },
+            },
+            type: {
+              type: 'string',
+              enum: ['lost', 'found'],
+              description: 'Type of the post',
+              example: 'found',
+            },
+            dateTimeOccured: {
+              type: 'date-time',
+              format: 'date-time',
+              description: 'Date and time when the event occurred',
+              example: '2023-03-15T14:30:00Z',
+            },
+            description: {
+              type: 'string',
+              description: 'Description of the post',
+              example: 'White cat found near the park.',
+            },
+            photos: {
+              type: 'array',
+              items: {
+                type: 'string',
+                format: 'uri',
+                description: 'URL of the photo',
+                example: 'https://example.com/photo.jpg',
+              },
+            },
+            isResolved: {
+              type: 'boolean',
+              description: 'Indicates if the post has been resolved',
+              example: false,
             },
           },
         },
         Comment: {
           type: 'object',
-          required: ['content', 'movieId'],
+          required: ['commentText', 'postId', 'sender'],
           properties: {
             _id: {
               type: 'string',
-              description: 'Comment ID (MongoDB ObjectId)',
-              example: '507f1f77bcf86cd799439013',
-            },
-            content: {
-              type: 'string',
-              description: 'Comment content',
-              example: 'Great movie!',
-            },
-            movieId: {
-              type: 'string',
-              description: 'ID of the movie being commented on',
+              description: 'Comment unique identifier',
               example: '507f1f77bcf86cd799439011',
             },
-            userId: {
+            commentText: {
               type: 'string',
-              description: 'ID of the user who wrote the comment',
-              example: '507f1f77bcf86cd799439012',
+              description: 'Comment content',
+              example: 'Adorable!',
+            },
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Creation timestamp',
+            },
+            postId: {
+              type: 'string',
+              description: 'ID of the post this comment belongs to',
+              example: '507f1f77bcf86cd799439011',
+            },
+            sender: {
+              type: 'string',
+              description: 'ID of the user who wrote this comment',
+              example: '507f1f77bcf86cd799439011',
             },
           },
         },
@@ -111,31 +192,31 @@ const options: swaggerJsdoc.Options = {
             email: {
               type: 'string',
               format: 'email',
-              description: 'User email',
               example: 'user@example.com',
             },
             password: {
               type: 'string',
-              description: 'User password',
               example: 'password123',
             },
           },
         },
         RegisterRequest: {
           type: 'object',
-          required: ['email', 'password'],
+          required: ['email', 'password', 'username'],
           properties: {
             email: {
               type: 'string',
               format: 'email',
-              description: 'User email',
               example: 'user@example.com',
             },
             password: {
               type: 'string',
               minLength: 6,
-              description: 'User password (minimum 6 characters)',
               example: 'password123',
+            },
+            username: {
+              type: 'string',
+              example: 'petlover123',
             },
           },
         },
@@ -160,7 +241,7 @@ const options: swaggerJsdoc.Options = {
           properties: {
             refreshToken: {
               type: 'string',
-              description: 'JWT refresh token',
+              description: 'Valid refresh token',
               example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
             },
           },
@@ -168,395 +249,111 @@ const options: swaggerJsdoc.Options = {
         Error: {
           type: 'object',
           properties: {
-            message: {
+            error: {
               type: 'string',
               description: 'Error message',
               example: 'An error occurred',
             },
-            status: {
-              type: 'number',
-              description: 'HTTP status code',
-              example: 400,
+          },
+        },
+        ValidationError: {
+          type: 'object',
+          properties: {
+            error: {
+              type: 'string',
+              description: 'Validation error message',
+              example: 'Validation failed: Email is required',
+            },
+          },
+        },
+      },
+      responses: {
+        UnauthorizedError: {
+          description: 'Access token is missing or invalid',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/Error',
+              },
+              example: {
+                error: 'missing or invalid token',
+              },
+            },
+          },
+        },
+        NotFoundError: {
+          description: 'The specified resource was not found',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/Error',
+              },
+              example: {
+                error: 'Data not found',
+              },
+            },
+          },
+        },
+        ValidationError: {
+          description: 'Validation error',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ValidationError',
+              },
+              example: {
+                error: 'Validation failed: ...',
+              },
+            },
+          },
+        },
+        ConflictError: {
+          description: 'Conflict error (e.g. duplicate key)',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  error: {
+                    type: 'string',
+                    example: 'Unique constraint error',
+                  },
+                  keys: {
+                    type: 'array',
+                    items: {
+                      type: 'string',
+                    },
+                    example: ['email'],
+                  },
+                },
+              },
+            },
+          },
+        },
+        ServerError: {
+          description: 'Internal server error',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/Error',
+              },
+              example: {
+                error: 'Something went wrong, please try again later',
+              },
             },
           },
         },
       },
     },
-    tags: [
+    security: [
       {
-        name: 'Authentication',
-        description: 'User authentication and authorization endpoints',
-      },
-      {
-        name: 'Movies',
-        description: 'Movie management endpoints',
-      },
-      {
-        name: 'Comments',
-        description: 'Comment management endpoints',
+        bearerAuth: [],
       },
     ],
   },
-  apis: [], // Will be set conditionally below
+  apis: ['./src/routes/*.ts', './src/controllers/*.ts'],
 };
 
-// Manually define paths since JSDoc parsing has issues
-const manualPaths = {
-  '/auth/register': {
-    post: {
-      tags: ['Authentication'],
-      summary: 'Register a new user',
-      description: 'Create a new user account with email and password',
-      requestBody: {
-        required: true,
-        content: {
-          'application/json': {
-            schema: { $ref: '#/components/schemas/RegisterRequest' },
-          },
-        },
-      },
-      responses: {
-        201: {
-          description: 'User registered successfully',
-          content: {
-            'application/json': {
-              schema: { $ref: '#/components/schemas/AuthResponse' },
-            },
-          },
-        },
-        400: { description: 'Invalid input data' },
-        409: { description: 'User already exists' },
-      },
-    },
-  },
-  '/auth/login': {
-    post: {
-      tags: ['Authentication'],
-      summary: 'Login user',
-      description: 'Authenticate user and return JWT tokens',
-      requestBody: {
-        required: true,
-        content: {
-          'application/json': {
-            schema: { $ref: '#/components/schemas/LoginRequest' },
-          },
-        },
-      },
-      responses: {
-        200: {
-          description: 'Login successful',
-          content: {
-            'application/json': {
-              schema: { $ref: '#/components/schemas/AuthResponse' },
-            },
-          },
-        },
-        401: { description: 'Invalid credentials' },
-      },
-    },
-  },
-  '/auth/refresh': {
-    post: {
-      tags: ['Authentication'],
-      summary: 'Refresh access token',
-      requestBody: {
-        required: true,
-        content: {
-          'application/json': {
-            schema: { $ref: '#/components/schemas/RefreshTokenRequest' },
-          },
-        },
-      },
-      responses: {
-        200: {
-          description: 'Token refreshed successfully',
-          content: {
-            'application/json': {
-              schema: { $ref: '#/components/schemas/AuthResponse' },
-            },
-          },
-        },
-        401: { description: 'Invalid refresh token' },
-      },
-    },
-  },
-  '/movie': {
-    get: {
-      tags: ['Movies'],
-      summary: 'Get all movies',
-      responses: {
-        200: {
-          description: 'List of movies',
-          content: {
-            'application/json': {
-              schema: {
-                type: 'array',
-                items: { $ref: '#/components/schemas/Movie' },
-              },
-            },
-          },
-        },
-      },
-    },
-    post: {
-      tags: ['Movies'],
-      summary: 'Create a new movie',
-      security: [{ bearerAuth: [] }],
-      requestBody: {
-        required: true,
-        content: {
-          'application/json': {
-            schema: {
-              type: 'object',
-              required: ['title', 'year'],
-              properties: {
-                title: { type: 'string' },
-                year: { type: 'number' },
-              },
-            },
-          },
-        },
-      },
-      responses: {
-        201: {
-          description: 'Movie created successfully',
-          content: {
-            'application/json': {
-              schema: { $ref: '#/components/schemas/Movie' },
-            },
-          },
-        },
-        401: { description: 'Unauthorized' },
-      },
-    },
-  },
-  '/movie/{id}': {
-    get: {
-      tags: ['Movies'],
-      summary: 'Get movie by ID',
-      parameters: [
-        {
-          name: 'id',
-          in: 'path',
-          required: true,
-          schema: { type: 'string' },
-        },
-      ],
-      responses: {
-        200: {
-          description: 'Movie details',
-          content: {
-            'application/json': {
-              schema: { $ref: '#/components/schemas/Movie' },
-            },
-          },
-        },
-        404: { description: 'Movie not found' },
-      },
-    },
-    put: {
-      tags: ['Movies'],
-      summary: 'Update a movie',
-      security: [{ bearerAuth: [] }],
-      parameters: [
-        {
-          name: 'id',
-          in: 'path',
-          required: true,
-          schema: { type: 'string' },
-        },
-      ],
-      requestBody: {
-        required: true,
-        content: {
-          'application/json': {
-            schema: {
-              type: 'object',
-              properties: {
-                title: { type: 'string' },
-                year: { type: 'number' },
-              },
-            },
-          },
-        },
-      },
-      responses: {
-        200: { description: 'Movie updated successfully' },
-        401: { description: 'Unauthorized' },
-        403: { description: 'Forbidden - Not the movie creator' },
-        404: { description: 'Movie not found' },
-      },
-    },
-    delete: {
-      tags: ['Movies'],
-      summary: 'Delete a movie',
-      security: [{ bearerAuth: [] }],
-      parameters: [
-        {
-          name: 'id',
-          in: 'path',
-          required: true,
-          schema: { type: 'string' },
-        },
-      ],
-      responses: {
-        200: { description: 'Movie deleted successfully' },
-        401: { description: 'Unauthorized' },
-        403: { description: 'Forbidden - Not the movie creator' },
-        404: { description: 'Movie not found' },
-      },
-    },
-  },
-  '/comment': {
-    get: {
-      tags: ['Comments'],
-      summary: 'Get all comments',
-      parameters: [
-        {
-          name: 'movieId',
-          in: 'query',
-          schema: { type: 'string' },
-          description: 'Filter by movie ID',
-        },
-      ],
-      responses: {
-        200: {
-          description: 'List of comments',
-          content: {
-            'application/json': {
-              schema: {
-                type: 'array',
-                items: { $ref: '#/components/schemas/Comment' },
-              },
-            },
-          },
-        },
-      },
-    },
-    post: {
-      tags: ['Comments'],
-      summary: 'Create a new comment',
-      security: [{ bearerAuth: [] }],
-      requestBody: {
-        required: true,
-        content: {
-          'application/json': {
-            schema: {
-              type: 'object',
-              required: ['content', 'movieId'],
-              properties: {
-                content: { type: 'string' },
-                movieId: { type: 'string' },
-              },
-            },
-          },
-        },
-      },
-      responses: {
-        201: {
-          description: 'Comment created successfully',
-          content: {
-            'application/json': {
-              schema: { $ref: '#/components/schemas/Comment' },
-            },
-          },
-        },
-        401: { description: 'Unauthorized' },
-      },
-    },
-  },
-  '/comment/{id}': {
-    get: {
-      tags: ['Comments'],
-      summary: 'Get comment by ID',
-      parameters: [
-        {
-          name: 'id',
-          in: 'path',
-          required: true,
-          schema: { type: 'string' },
-        },
-      ],
-      responses: {
-        200: {
-          description: 'Comment details',
-          content: {
-            'application/json': {
-              schema: { $ref: '#/components/schemas/Comment' },
-            },
-          },
-        },
-        404: { description: 'Comment not found' },
-      },
-    },
-    put: {
-      tags: ['Comments'],
-      summary: 'Update a comment',
-      security: [{ bearerAuth: [] }],
-      parameters: [
-        {
-          name: 'id',
-          in: 'path',
-          required: true,
-          schema: { type: 'string' },
-        },
-      ],
-      requestBody: {
-        required: true,
-        content: {
-          'application/json': {
-            schema: {
-              type: 'object',
-              properties: {
-                content: { type: 'string' },
-                movieId: { type: 'string' },
-              },
-            },
-          },
-        },
-      },
-      responses: {
-        200: { description: 'Comment updated successfully' },
-        401: { description: 'Unauthorized' },
-        403: { description: 'Forbidden - Not the comment creator' },
-        404: { description: 'Comment not found' },
-      },
-    },
-    delete: {
-      tags: ['Comments'],
-      summary: 'Delete a comment',
-      security: [{ bearerAuth: [] }],
-      parameters: [
-        {
-          name: 'id',
-          in: 'path',
-          required: true,
-          schema: { type: 'string' },
-        },
-      ],
-      responses: {
-        200: { description: 'Comment deleted successfully' },
-        401: { description: 'Unauthorized' },
-        403: { description: 'Forbidden - Not the comment creator' },
-        404: { description: 'Comment not found' },
-      },
-    },
-  },
-};
+const specs = swaggerJsdoc(options);
 
-// Add manual paths to the options definition
-const completeOptions: swaggerJsdoc.Options = {
-  definition: {
-    openapi: '3.0.0',
-    info: options.definition!.info!,
-    servers: options.definition!.servers,
-    components: options.definition!.components,
-    tags: options.definition!.tags,
-    paths: manualPaths,
-  },
-  apis: [], // No need for file parsing since we have manual paths
-};
-
-const swaggerSpec = swaggerJsdoc(completeOptions);
-
-export { swaggerUi, swaggerSpec };
+export { specs, swaggerUi };
