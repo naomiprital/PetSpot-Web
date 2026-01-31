@@ -1,0 +1,100 @@
+
+### 1. Register a New User
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+    "email": "goodguy@test.com",
+    "password": "password123",
+    "username": "GoodGuy"
+}
+
+### 2. Login as GoodGuy
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+    "email": "goodguy@test.com",
+    "password": "password123"
+}
+
+### 3. Logout (Requires Refresh Token)
+POST http://localhost:8080/auth/logout
+Content-Type: application/json
+
+{
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTdkZmRkM2QxYzRiOGFmNzM0ZTEwNWIiLCJpYXQiOjE3Njk4NjQ2NjcsImV4cCI6MTc2OTg2ODI2N30.YuEGTrMSB_6ymOxmCQ-kFJc7CZaSd5p2-t3GmtSufUU"
+}
+### 4. Test logout by refreshing token (Should Fail)
+POST http://localhost:8080/auth/refresh-token
+Content-Type: application/json
+
+{
+    "refreshToken": "eeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTdkZmRkM2QxYzRiOGFmNzM0ZTEwNWIiLCJpYXQiOjE3Njk4NjQ2NjcsImV4cCI6MTc2OTg2ODI2N30.YuEGTrMSB_6ymOxmCQ-kFJc7CZaSd5p2-t3GmtSufUU"
+}
+
+### 4. Get GoodGuy's Profile
+GET http://localhost:8080/user/697e11a078ab2a627d2819f5
+
+### 5. Update GoodGuy's Profile
+PUT http://localhost:8080/user/697e11a078ab2a627d2819f5
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTdlMTFhMDc4YWIyYTYyN2QyODE5ZjUiLCJpYXQiOjE3Njk4Njk4NDgsImV4cCI6MTc2OTg3MzQ0OH0.MEkRlQYGrxRWsWsk_ipJZVbmtLyKhcHfndTFayx9_LU
+
+{
+    "username": "GoodGuy Updated"
+}
+
+### 6. Create a Post
+POST http://localhost:8080/post
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTdkZmRkM2QxYzRiOGFmNzM0ZTEwNWIiLCJpYXQiOjE3Njk4NjQ3OTQsImV4cCI6MTc2OTg2ODM5NH0.uYmE3FQpuLelBEmgAHRBnx6zWzCb0sh0FJrnKDAFw_U
+
+{
+    "title": "Found Dog",
+    "type": "found",
+    "animalType": "dog",
+    "location": { "type": "Point", "coordinates": [32.0853, 34.7818] },
+    "dateTimeOccured": "2026-01-31",
+    "description": "Cute puppy found near the park"
+}
+
+### 6.5. Get all posts (To find the ID)
+GET http://localhost:8080/post
+
+### 7. Update your Post
+PUT http://localhost:8080/post/697dfe79d1c4b8af734e106a
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTdkZmRkM2QxYzRiOGFmNzM0ZTEwNWIiLCJpYXQiOjE3Njk4NjQ3OTQsImV4cCI6MTc2OTg2ODM5NH0.uYmE3FQpuLelBEmgAHRBnx6zWzCb0sh0FJrnKDAFw_U
+
+{
+    "description": "Update: The owner was found!"
+}
+
+### 8. Register a "BadGuy"
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+    "email": "badguy@test.com",
+    "password": "123",
+    "username": "BadGuy"
+}
+
+### 9. Login as BadGuy (To get his token)
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+    "email": "badguy@test.com",
+    "password": "123"
+}
+
+### 10. BadGuy tries to DELETE GoodGuy's Post/Comment
+PUT http://localhost:8080/post/697dfe79d1c4b8af734e106a
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTdkZmUyOWQxYzRiOGFmNzM0ZTEwNjIiLCJpYXQiOjE3Njk4NjQ4ODUsImV4cCI6MTc2OTg2ODQ4NX0.hGJOxHUKOfosoQwXLWh2rNgdbmUR5UDTxQ6pdLtWFaQ
+
+{
+    "description": "I AM HACKING YOU"
+}
