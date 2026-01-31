@@ -34,12 +34,12 @@ Content-Type: application/json
 }
 
 ### 4. Get GoodGuy's Profile
-GET http://localhost:8080/user/697dfdd3d1c4b8af734e105b
+GET http://localhost:8080/user/697e11a078ab2a627d2819f5
 
 ### 5. Update GoodGuy's Profile
-PUT http://localhost:8080/user/697dfdd3d1c4b8af734e105b
+PUT http://localhost:8080/user/697e11a078ab2a627d2819f5
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTdkZmRkM2QxYzRiOGFmNzM0ZTEwNWIiLCJpYXQiOjE3Njk4NjQ3OTQsImV4cCI6MTc2OTg2ODM5NH0.uYmE3FQpuLelBEmgAHRBnx6zWzCb0sh0FJrnKDAFw_U
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTdlMTFhMDc4YWIyYTYyN2QyODE5ZjUiLCJpYXQiOjE3Njk4Njk4NDgsImV4cCI6MTc2OTg3MzQ0OH0.MEkRlQYGrxRWsWsk_ipJZVbmtLyKhcHfndTFayx9_LU
 
 {
     "username": "GoodGuy Updated"

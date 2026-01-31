@@ -2,28 +2,7 @@ import request from 'supertest';
 import app from '../../index';
 import mongoose from 'mongoose';
 import User from '../models/userModel';
-
-const userData = {
-  email: 'testuser@gmail.com',
-  password: 'password123',
-  username: 'TestUser',
-  _id: '',
-  token: '',
-  refreshToken: '',
-};
-
-const testPost = {
-  title: 'Test Post',
-  content: 'This is a test content',
-  animalType: 'dog',
-  type: 'lost',
-  dateTimeOccured: new Date(),
-  location: {
-    type: 'Point',
-    coordinates: [34.7818, 32.0853],
-  },
-  sender: '12345',
-};
+import { testPost, userData } from './utils';
 
 beforeAll(async () => {
   if (mongoose.connection.readyState === 0) {
