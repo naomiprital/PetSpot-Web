@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
-import { User } from '@/types/user';
-import { getLogedInUser, testPost, UserData, userData } from './utils';
+import { getLogedInUser, testPost, UserData } from './utils';
 import app from '../../index';
 
 let loginUser: UserData;
@@ -30,9 +29,30 @@ describe('Post API Tests', () => {
       .set('Authorization', 'Bearer ' + loginUser.token)
       .send(testPost);
 
+    if (response.status !== 201) {
+      testPost._id = response.body._id;
+    }
+
     expect(response.status).toBe(201);
     expect(response.body).toHaveProperty('_id');
-    expect(response.body.type).toBe(testPost.type);
+    expect(response.body.description).toBe(testPost.description);
     expect(response.body.sender).toBe(loginUser._id);
   });
+
+  test('Create Post - should be denied with invalid token', async () => {
+    const response = await request(app)
+      .post('/post')
+      .set('Authorization', 'Bearer ' + loginUser.token + 'junk')
+      .send(testPost);
+
+    expect(response.statusCode).toBe(401);
+  });
+
+  // test('Get Post by ID - should retrieve a specific post', async () => {
+  //   const response = await request(app)
+  //     .get('/post/' + testPost._id)
+  //     .set('Authorization', 'Bearer ' + loginUser.token);
+  //   expect(response.statusCode).toBe(200);
+  //   expect(response.body).toHaveProperty('_id', testPost._id);
+  // });
 });

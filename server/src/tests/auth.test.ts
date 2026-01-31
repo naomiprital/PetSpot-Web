@@ -49,24 +49,6 @@ describe('Auth API', () => {
     userData.refreshToken = response.body.refreshToken;
   });
 
-  test('POST /post - should be allowed with valid token', async () => {
-    const response = await request(app)
-      .post('/post')
-      .set('Authorization', 'Bearer ' + userData.token)
-      .send(testPost);
-
-    expect(response.statusCode).not.toBe(401);
-  });
-
-  test('POST /post - should be denied with invalid token', async () => {
-    const response = await request(app)
-      .post('/post')
-      .set('Authorization', 'Bearer ' + userData.token + 'junk')
-      .send(testPost);
-
-    expect(response.statusCode).toBe(401);
-  });
-
   test('Test Token Expiration & Refresh', async () => {
     await new Promise(r => setTimeout(r, 6000));
 
