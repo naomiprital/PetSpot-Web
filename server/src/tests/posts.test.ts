@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 import request from 'supertest';
 import { getLogedInUser, testPost, UserData } from './utils';
 import app from '../../index';
-import { log } from 'node:console';
 
 let loginUser: UserData;
 

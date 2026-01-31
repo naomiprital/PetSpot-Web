@@ -11,7 +11,8 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "test": "jest --detectOpenHandles",
-    "testPosts": "jest --runInBand --detectOpenHandles --forceExit ./src/tests/posts.test.ts"
+    "testPosts": "jest --runInBand --detectOpenHandles --forceExit ./src/tests/posts.test.ts",
+    "testComments": "jest --runInBand --detectOpenHandles --forceExit ./src/tests/comments.test.ts"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
