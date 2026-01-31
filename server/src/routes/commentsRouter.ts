@@ -6,7 +6,7 @@ const commentsRouter = Router();
 
 /**
  * @swagger
- * /comments:
+ * /comment:
  *   get:
  *     tags: [Comments]
  *     summary: Retrieve all comments
@@ -33,7 +33,7 @@ commentsRouter.get('/', commentsController.getComments);
 
 /**
  * @swagger
- * /comments/{id}:
+ * /comment/{id}:
  *   get:
  *     tags: [Comments]
  *     summary: Retrieve a single comment
@@ -91,7 +91,7 @@ commentsRouter.get('/:id', commentsController.getCommentById);
 
 /**
  * @swagger
- * /comments:
+ * /comment:
  *   post:
  *     tags: [Comments]
  *     summary: Create a new comment
@@ -140,7 +140,7 @@ commentsRouter.post('/', authMiddleware, commentsController.createComment);
 
 /**
  * @swagger
- * /comments/{id}:
+ * /comment/{id}:
  *   put:
  *     tags: [Comments]
  *     summary: Update a comment
@@ -204,7 +204,7 @@ commentsRouter.put('/:id', authMiddleware, commentsController.updateComment);
 
 /**
  * @swagger
- * /comments/{id}:
+ * /comment/{id}:
  *   delete:
  *     tags: [Comments]
  *     summary: Delete a comment

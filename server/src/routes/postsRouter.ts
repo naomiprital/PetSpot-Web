@@ -6,7 +6,7 @@ const postsRouter = Router();
 
 /**
  * @swagger
- * /posts:
+ * /post:
  *  get:
  *    tags: [Posts]
  *    summary: Retrieve all posts
@@ -33,7 +33,7 @@ postsRouter.get('/', postsController.getPosts);
 
 /**
  * @swagger
- * /posts/{id}:
+ * /post/{id}:
  *  get:
  *    tags: [Posts]
  *    summary: Retrieve a single post
@@ -81,7 +81,7 @@ postsRouter.get('/:id', postsController.getPostById);
 
 /**
  * @swagger
- * /posts:
+ * /post:
  *  post:
  *    tags: [Posts]
  *    summary: Create a new post
@@ -122,7 +122,7 @@ postsRouter.post('/', authMiddleware, postsController.createPost);
 
 /**
  * @swagger
- * /posts/{id}:
+ * /post/{id}:
  *  put:
  *    tags: [Posts]
  *    summary: Update a post
