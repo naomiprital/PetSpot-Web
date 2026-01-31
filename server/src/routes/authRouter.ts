@@ -105,6 +105,13 @@ authRouter.post('/login', authController.login);
  *     tags: [Authentication]
  *     summary: Logout a user
  *     description: Invalidate the user's JWT token
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/RefreshTokenRequest'
  *     responses:
  *       200:
  *         description: User logged out successfully
