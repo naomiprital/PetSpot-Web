@@ -6,7 +6,7 @@ const userRouter = Router();
 
 /**
  * @swagger
- * /users/{id}:
+ * /user/{id}:
  *   get:
  *     tags: [Users]
  *     summary: Retrieve a single user
@@ -46,7 +46,7 @@ userRouter.get('/:id', userController.getUserById);
 
 /**
  * @swagger
- * /users/{id}:
+ * /user/{id}:
  *   put:
  *     tags: [Users]
  *     summary: Update a user
