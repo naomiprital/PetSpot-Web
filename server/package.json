@@ -13,6 +13,7 @@
     "test": "jest --detectOpenHandles",
     "testAuth": "jest --runInBand --detectOpenHandles --forceExit ./src/tests/auth.test.ts",
     "testPosts": "jest --runInBand --detectOpenHandles --forceExit ./src/tests/posts.test.ts",
+    "testFile": "jest --runInBand --detectOpenHandles --forceExit ./src/tests/file.test.ts",
     "testComments": "jest --runInBand --detectOpenHandles --forceExit ./src/tests/comments.test.ts"
   },
   "dependencies": {
@@ -21,6 +22,7 @@
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.1.2",
+    "multer": "^2.0.2",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   },
@@ -29,6 +31,7 @@
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.0.0",
     "@types/node": "^25.0.5",
     "@types/supertest": "^6.0.3",
     "@types/swagger-jsdoc": "^6.0.4",
