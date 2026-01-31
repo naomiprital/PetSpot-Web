@@ -10,7 +10,8 @@
     "dev": "tsx watch index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "jest --detectOpenHandles"
+    "test": "jest --runInBand --detectOpenHandles --forceExit",
+    "testPosts": "jest --runInBand --detectOpenHandles --forceExit ./src/tests/posts.test.ts"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
