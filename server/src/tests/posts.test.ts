@@ -10,6 +10,7 @@ beforeAll(async () => {
     await mongoose.connect(process.env.DATABASE_URL as string);
   }
   loginUser = await getLogedInUser(app);
+  testPost.sender = loginUser._id;
 });
 
 afterAll(async () => {
