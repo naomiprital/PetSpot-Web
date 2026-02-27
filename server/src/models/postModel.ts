@@ -43,6 +43,15 @@ const postSchema = new mongoose.Schema<Post>(
       type: [String],
       default: [],
     },
+    likes: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User',
+        },
+      ],
+      default: [],
+    },
     isResolved: {
       type: Boolean,
       default: false,

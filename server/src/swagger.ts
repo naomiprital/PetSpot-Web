@@ -167,6 +167,14 @@ const options: swaggerJsdoc.Options = {
               description: 'Indicates if the post has been resolved',
               example: false,
             },
+            likes: {
+              type: 'array',
+              items: {
+                type: 'string',
+                description: 'ID of the user who liked the post',
+                example: '507f1f77bcf86cd799439011',
+              },
+            },
           },
         },
         Comment: {
