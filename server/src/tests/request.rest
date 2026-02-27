@@ -58,7 +58,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTdkZmRkM
     "title": "Found Dog",
     "type": "found",
     "animalType": "dog",
-    "location": { "type": "Point", "coordinates": [32.0853, 34.7818] },
+    "location": { "type": "Point", "coordinates": [-122.4194, 37.7749] },
     "dateTimeOccured": "2026-01-31",
     "description": "Cute puppy found near the park"
 }
