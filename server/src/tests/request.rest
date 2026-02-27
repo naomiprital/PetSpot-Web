@@ -6,7 +6,9 @@ Content-Type: application/json
 {
     "email": "goodguy@test.com",
     "password": "password123",
-    "username": "GoodGuy"
+    "firstName": "Good",
+    "lastName": "Guy",
+    "phoneNumber": "1234567890",
 }
 
 ### 2. Login as GoodGuy
@@ -42,7 +44,9 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTdlMTFhMDc4YWIyYTYyN2QyODE5ZjUiLCJpYXQiOjE3Njk4Njk4NDgsImV4cCI6MTc2OTg3MzQ0OH0.MEkRlQYGrxRWsWsk_ipJZVbmtLyKhcHfndTFayx9_LU
 
 {
-    "username": "GoodGuy Updated"
+    "firstName": "Updated",
+    "lastName": "Name",
+    "phoneNumber": "9876543210"
 }
 
 ### 6. Create a Post
@@ -78,7 +82,9 @@ Content-Type: application/json
 {
     "email": "badguy@test.com",
     "password": "123",
-    "username": "BadGuy"
+    "firstName": "Bad",
+    "lastName": "Guy",
+    "phoneNumber": "0987654321"
 }
 
 ### 9. Login as BadGuy (To get his token)

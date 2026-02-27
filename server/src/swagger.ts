@@ -33,7 +33,14 @@ const options: swaggerJsdoc.Options = {
       schemas: {
         User: {
           type: 'object',
-          required: ['email', 'username', 'password'],
+          required: [
+            'email',
+            'password',
+            'firstName',
+            'lastName',
+            'phoneNumber',
+            'photo',
+          ],
           properties: {
             _id: {
               type: 'string',
@@ -46,16 +53,32 @@ const options: swaggerJsdoc.Options = {
               description: 'User email address',
               example: 'user@example.com',
             },
-            username: {
-              type: 'string',
-              description: 'User username',
-              example: 'petlover123',
-            },
             password: {
               type: 'string',
               minLength: 6,
               description: 'User password (hashed when stored)',
               example: 'password123',
+            },
+            firstName: {
+              type: 'string',
+              description: 'User first name',
+              example: 'John',
+            },
+            lastName: {
+              type: 'string',
+              description: 'User last name',
+              example: 'Doe',
+            },
+            phoneNumber: {
+              type: 'string',
+              description: 'User phone number',
+              example: '+1234567890',
+            },
+            photo: {
+              type: 'string',
+              format: 'uri',
+              description: 'URL of the user profile photo',
+              example: 'https://example.com/photo.jpg',
             },
           },
         },
@@ -194,7 +217,13 @@ const options: swaggerJsdoc.Options = {
         },
         RegisterRequest: {
           type: 'object',
-          required: ['email', 'password', 'username'],
+          required: [
+            'email',
+            'password',
+            'firstName',
+            'lastName',
+            'phoneNumber',
+          ],
           properties: {
             email: {
               type: 'string',
@@ -206,9 +235,22 @@ const options: swaggerJsdoc.Options = {
               minLength: 6,
               example: 'password123',
             },
-            username: {
+            firstName: {
               type: 'string',
-              example: 'petlover123',
+              example: 'John',
+            },
+            lastName: {
+              type: 'string',
+              example: 'Doe',
+            },
+            phoneNumber: {
+              type: 'string',
+              example: '+1234567890',
+            },
+            photo: {
+              type: 'string',
+              format: 'uri',
+              example: 'https://example.com/photo.jpg',
             },
           },
         },

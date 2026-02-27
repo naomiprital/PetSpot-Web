@@ -1,12 +1,8 @@
 import { User } from '@/types/user';
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
 const userSchema = new Schema<User>(
   {
-    username: {
-      type: String,
-      required: true,
-    },
     email: {
       type: String,
       required: true,
@@ -15,6 +11,22 @@ const userSchema = new Schema<User>(
     password: {
       type: String,
       required: true,
+    },
+    firstName: {
+      type: String,
+      required: true,
+    },
+    lastName: {
+      type: String,
+      required: true,
+    },
+    phoneNumber: {
+      type: String,
+    },
+    photo: {
+      type: String,
+      default:
+        'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg',
     },
     refreshToken: {
       type: [String],

@@ -20,7 +20,7 @@ const generateTokens = (userId: string) => {
 };
 
 const register = async (user: UserType) => {
-  const { email, password, username } = user;
+  const { email, password, firstName, lastName, phoneNumber, photo } = user;
 
   const existingUser = await UserModel.findOne({ email });
   if (existingUser) {
@@ -33,7 +33,10 @@ const register = async (user: UserType) => {
   const newUser = await UserModel.create({
     email,
     password: hashedPassword,
-    username,
+    firstName,
+    lastName,
+    phoneNumber,
+    photo,
   });
 
   return newUser;
