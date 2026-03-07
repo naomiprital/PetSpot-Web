@@ -78,7 +78,7 @@ const options: swaggerJsdoc.Options = {
               type: 'string',
               format: 'uri',
               description: 'URL of the user profile photo',
-              example: 'https://example.com/photo.jpg',
+              example: 'assets/images/default-user-avatar.png',
             },
           },
         },
@@ -258,7 +258,7 @@ const options: swaggerJsdoc.Options = {
             photo: {
               type: 'string',
               format: 'uri',
-              example: 'https://example.com/photo.jpg',
+              example: '/assets/images/default-user-avatar.png',
             },
           },
         },
