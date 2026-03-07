@@ -25,7 +25,7 @@ const userSchema = new Schema<User>(
     },
     photo: {
       type: String,
-      default: '/assets/images/default-user-avatar.png',
+      default: '/images/default-user-avatar.png',
     },
     refreshToken: {
       type: [String],

@@ -159,7 +159,7 @@ const options: swaggerJsdoc.Options = {
                 type: 'string',
                 format: 'uri',
                 description: 'URL of the photo',
-                example: 'https://example.com/photo.jpg',
+                example: '/images/default-user-avatar.png',
               },
             },
             isResolved: {
@@ -258,7 +258,7 @@ const options: swaggerJsdoc.Options = {
             photo: {
               type: 'string',
               format: 'uri',
-              example: '/assets/images/default-user-avatar.png',
+              example: '/images/default-user-avatar.png',
             },
           },
         },
