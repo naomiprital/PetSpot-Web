@@ -11,6 +11,12 @@ const postsRouter = Router();
  *    tags: [Posts]
  *    summary: Retrieve all posts
  *    description: Get a list of all posts
+ *    parameters:
+ *     - in: query
+ *       name: sender
+ *       description: Filter posts by sender ID
+ *       schema:
+ *         type: string
  *    responses:
  *      200:
  *        description: A list of posts

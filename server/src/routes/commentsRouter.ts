@@ -11,6 +11,12 @@ const commentsRouter = Router();
  *     tags: [Comments]
  *     summary: Retrieve all comments
  *     description: Get a list of all comments
+ *     parameters:
+ *      - in: query
+ *        name: postId
+ *        description: Filter comments by post ID
+ *        schema:
+ *          type: string
  *     responses:
  *       200:
  *         description: A list of comments

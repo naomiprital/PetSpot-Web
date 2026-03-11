@@ -26,14 +26,19 @@ describe('User API & Security', () => {
     const resA = await request(app).post('/auth/register').send({
       email: 'victim@test.com',
       password: 'password123',
-      username: 'Victim User',
+      firstName: 'Victim',
+      lastName: 'User',
+      phoneNumber: '1234567890',
+      photo: 'https://example.com/victim.jpg',
     });
     userAId = resA.body._id;
 
     const resB = await request(app).post('/auth/register').send({
       email: 'hacker@test.com',
       password: 'password123',
-      username: 'Hacker User',
+      firstName: 'Hacker',
+      lastName: 'User',
+      phoneNumber: '0987654321',
     });
     userBId = resB.body._id;
 
@@ -49,7 +54,8 @@ describe('User API & Security', () => {
     const response = await request(app).get(`/user/${userAId}`);
 
     expect(response.statusCode).toBe(200);
-    expect(response.body.username).toBe('Victim User');
+    expect(response.body.firstName).toBe('Victim');
+    expect(response.body.lastName).toBe('User');
     expect(response.body.email).toBe('victim@test.com');
     expect(response.body.password).toBeUndefined();
   });
@@ -59,11 +65,15 @@ describe('User API & Security', () => {
       .put(`/user/${userAId}`)
       .set('Authorization', 'Bearer ' + userAToken)
       .send({
-        username: 'Updated Name',
+        firstName: 'Updated',
+        lastName: 'Name',
+        phoneNumber: '9876543210',
       });
 
     expect(response.statusCode).toBe(200);
-    expect(response.body.username).toBe('Updated Name');
+    expect(response.body.firstName).toBe('Updated');
+    expect(response.body.lastName).toBe('Name');
+    expect(response.body.phoneNumber).toBe('9876543210');
   });
 
   test('PUT /user/:id - should BLOCK a hacker from updating someone else', async () => {
@@ -77,12 +87,16 @@ describe('User API & Security', () => {
       .put(`/user/${userAId}`)
       .set('Authorization', 'Bearer ' + hackerToken)
       .send({
-        username: 'HACKED BY BOB',
+        firstName: 'Hacked',
+        lastName: 'Hacker',
+        phoneNumber: '0000000000',
       });
 
     expect(response.statusCode).toBe(403);
 
     const userA = await UserModel.findById(userAId);
-    expect(userA?.username).toBe('Victim User');
+    expect(userA?.firstName).toBe('Victim');
+    expect(userA?.lastName).toBe('User');
+    expect(userA?.phoneNumber).toBe('1234567890');
   });
 });

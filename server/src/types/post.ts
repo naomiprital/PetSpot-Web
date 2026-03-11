@@ -27,6 +27,7 @@ export interface Post {
   dateTimeOccured: Date;
   description?: string;
   photos?: string[];
+  likes?: string[];
   isResolved: boolean;
   createdAt?: Date;
   updatedAt?: Date;

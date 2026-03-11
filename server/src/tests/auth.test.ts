@@ -25,7 +25,9 @@ describe('Auth API', () => {
     const response = await request(app).post('/auth/register').send({
       email: userData.email,
       password: userData.password,
-      username: userData.username,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      phoneNumber: userData.phoneNumber,
     });
 
     expect(response.statusCode).toBe(201);

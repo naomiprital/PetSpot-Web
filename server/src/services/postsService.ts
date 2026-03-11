@@ -1,5 +1,5 @@
 import Post from '@/models/postModel';
-import { Post as PostType} from '@/types/post';
+import { Post as PostType } from '@/types/post';
 
 const getPosts = async () => {
   return await Post.find();
@@ -19,13 +19,16 @@ const getPostsBySender = async (sender: string) => {
 };
 
 const updatePost = async (id: string, updateData: Partial<PostType>) => {
-  return await Post.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
-}
+  return await Post.findByIdAndUpdate(id, updateData, {
+    new: true,
+    runValidators: true,
+  });
+};
 
 export default {
   getPosts,
   createPost,
   getPostById,
   getPostsBySender,
-  updatePost
+  updatePost,
 };

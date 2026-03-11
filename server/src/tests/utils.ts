@@ -2,19 +2,24 @@ import request from 'supertest';
 import { Express } from 'express';
 
 export type UserData = {
+  _id: string;
   email: string;
   password: string;
-  username: string;
-  _id: string;
   token: string;
   refreshToken: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  photo?: string;
 };
 
-export const userData = {
+export const userData: UserData = {
+  _id: '',
   email: 'testuser@gmail.com',
   password: 'password123',
-  username: 'TestUser',
-  _id: '',
+  firstName: 'Test',
+  lastName: 'User',
+  phoneNumber: '1234567890',
   token: '',
   refreshToken: '',
 };
@@ -37,10 +42,18 @@ export const testPost = {
 export const getLogedInUser = async (app: Express): Promise<UserData> => {
   const email = userData.email;
   const password = userData.password;
-  const username = userData.username;
-  let response = await request(app)
-    .post('/auth/register')
-    .send({ email: email, password: password, username: username });
+  const firstName = userData.firstName;
+  const lastName = userData.lastName;
+  const phoneNumber = userData.phoneNumber;
+
+  let response = await request(app).post('/auth/register').send({
+    email: email,
+    password: password,
+    firstName: firstName,
+    lastName: lastName,
+    phoneNumber: phoneNumber,
+  });
+  const userPhoto = response.body.photo;
   response = await request(app)
     .post('/auth/login')
     .send({ email: email, password: password });
@@ -49,9 +62,12 @@ export const getLogedInUser = async (app: Express): Promise<UserData> => {
     _id: response.body._id,
     token: response.body.token,
     refreshToken: response.body.refreshToken,
-    username: username,
     email: email,
     password: password,
+    firstName: firstName,
+    lastName: lastName,
+    phoneNumber: phoneNumber,
+    photo: userPhoto,
   };
   return logedUser;
 };
