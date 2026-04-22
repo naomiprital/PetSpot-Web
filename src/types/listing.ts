@@ -24,7 +24,7 @@ export interface Listing {
   description: string;
   comments: ObjectId[];
   boosts: ObjectId[];
-  sender: ObjectId | string;
+  author: ObjectId | string;
   isResolved: boolean;
   isDeleted: boolean;
   createdAt?: Date;

@@ -4,7 +4,7 @@ export interface Comment {
   _id?: ObjectId | string;
   listingId: ObjectId | string;
   commentText: string;
-  sender: ObjectId | string;
+  author: ObjectId | string;
   createdAt?: Date;
   updatedAt?: Date;
 }

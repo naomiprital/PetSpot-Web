@@ -19,7 +19,7 @@ const listingSchema = new Schema<Listing>(
     description: { type: String, required: true },
     comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
     boosts: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-    sender: {
+    author: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,

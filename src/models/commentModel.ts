@@ -12,7 +12,7 @@ const commentSchema = new mongoose.Schema<Comment>(
       type: String,
       required: true,
     },
-    sender: {
+    author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
