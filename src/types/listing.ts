@@ -21,7 +21,7 @@ export interface Listing {
   imageUrl?: string;
   location: string;
   lastSeen: number;
-  description?: string;
+  description: string;
   comments: ObjectId[];
   boosts: ObjectId[];
   sender: ObjectId | string;

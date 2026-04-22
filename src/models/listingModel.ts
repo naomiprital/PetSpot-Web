@@ -16,7 +16,7 @@ const listingSchema = new Schema<Listing>(
     imageUrl: { type: String },
     location: { type: String, required: true },
     lastSeen: { type: Number, required: true },
-    description: { type: String },
+    description: { type: String, required: true },
     comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
     boosts: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     sender: {
