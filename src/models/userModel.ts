@@ -23,7 +23,7 @@ const userSchema = new Schema<User>(
     phoneNumber: {
       type: String,
     },
-    photo: {
+    imageUrl: {
       type: String,
       default: '/images/default-user-avatar.png',
     },

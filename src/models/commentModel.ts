@@ -3,16 +3,16 @@ import mongoose from 'mongoose';
 
 const commentSchema = new mongoose.Schema<Comment>(
   {
-    postId: {
+    listingId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Post',
+      ref: 'Listing',
       required: true,
     },
     commentText: {
       type: String,
       required: true,
     },
-    sender: {
+    author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,

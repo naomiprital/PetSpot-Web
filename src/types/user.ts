@@ -5,6 +5,8 @@ export interface User {
   firstName: string;
   lastName: string;
   phoneNumber: string;
-  photo?: string;
+  imageUrl: string;
   refreshToken: string[];
+  createdAt?: Date;
+  updatedAt?: Date;
 }
