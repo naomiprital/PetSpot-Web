@@ -1,5 +1,6 @@
 import Listing from '../models/listingModel';
 import { Listing as ListingType } from '@/types/listing';
+import aiService from './aiService';
 
 type CreateListingPayload = Pick<
   ListingType,
@@ -21,7 +22,7 @@ const getListings = async () => {
 };
 
 const getListingById = async (id: string) => {
-  return await Listing.findById({ _id: id, isDeleted: false })
+  return await Listing.findOne({ _id: id, isDeleted: false })
     .populate('author', 'firstName lastName email phoneNumber imageUrl')
     .populate({
       path: 'comments',
@@ -42,9 +43,16 @@ const createListing = async (
   authorId: string,
   listingData: CreateListingPayload
 ) => {
+  let aiTags = '';
+
+  if (listingData.imageUrl) {
+    aiTags = await aiService.generateHiddenTags(listingData.imageUrl);
+  }
+
   const newListing = await Listing.create({
     ...listingData,
     author: authorId,
+    aiVisualTags: aiTags,
   });
 
   return await newListing.populate(
@@ -63,9 +71,19 @@ const updateListing = async (
   if (!listing || listing.isDeleted) throw new Error('Listing not found');
   if (listing.author.toString() !== authorId) throw new Error('Unauthorized');
 
+  let newAiTags = listing.aiVisualTags;
+  if (updateData.imageUrl && updateData.imageUrl !== listing.imageUrl) {
+    newAiTags = await aiService.generateHiddenTags(updateData.imageUrl);
+  }
+
   return await Listing.findByIdAndUpdate(
     id,
-    { $set: updateData },
+    {
+      $set: {
+        ...updateData,
+        aiVisualTags: newAiTags,
+      },
+    },
     { new: true, runValidators: true }
   ).populate('author', 'firstName lastName email phoneNumber imageUrl');
 };

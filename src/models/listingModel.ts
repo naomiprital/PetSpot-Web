@@ -24,6 +24,7 @@ const listingSchema = new Schema<Listing>(
       ref: 'User',
       required: true,
     },
+    aiVisualTags: { type: String, default: '' },
     isResolved: { type: Boolean, default: false },
     isDeleted: { type: Boolean, default: false },
   },

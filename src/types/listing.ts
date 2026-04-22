@@ -25,6 +25,7 @@ export interface Listing {
   comments: ObjectId[];
   boosts: ObjectId[];
   author: ObjectId | string;
+  aiVisualTags?: string;
   isResolved: boolean;
   isDeleted: boolean;
   createdAt?: Date;
