@@ -26,11 +26,23 @@ const callCohereApi = async (content: any[]) => {
   return await response.json();
 };
 
-const smartSearchListings = async (query: string) => {
-  const listings = await Listing.find({ isDeleted: false })
+const smartSearchListings = async (
+  query: string,
+  type?: string,
+  animal?: string
+) => {
+  const dbQuery: any = {
+    isDeleted: false,
+    isResolved: false,
+  };
+
+  if (type && type !== 'all') dbQuery.listingType = type;
+  if (animal && animal !== 'all') dbQuery.animalType = animal;
+
+  const listings = await Listing.find(dbQuery)
     .select('_id animalType description location aiVisualTags')
     .sort({ createdAt: -1 })
-    .limit(50);
+    .limit(100);
 
   const prompt = `
     You are an AI assistant helping a user find a lost or found animal. 
@@ -40,7 +52,7 @@ const smartSearchListings = async (query: string) => {
     ${JSON.stringify(listings)}
 
     Task:
-    1. Find the listings whose descriptions match the user's query.
+    1. Find the listings whose descriptions or aiVisualTags match the user's query.
     2. Return ONLY a valid JSON array of the relevant listing _ids, sorted from most relevant to least.
     3. If no listings match, return [].
     
@@ -54,9 +66,14 @@ const smartSearchListings = async (query: string) => {
   const cleanedText = rawText.replace(/```json?|```/g, '').trim();
   const matchedIds: string[] = JSON.parse(cleanedText);
 
-  return await Listing.find({ _id: { $in: matchedIds } }).populate(
-    'author',
-    'firstName lastName imageUrl'
+  const populatedListings = await Listing.find({
+    _id: { $in: matchedIds },
+  }).populate('author', 'firstName lastName email phoneNumber imageUrl');
+
+  return populatedListings.sort(
+    (a, b) =>
+      matchedIds.indexOf(a._id.toString()) -
+      matchedIds.indexOf(b._id.toString())
   );
 };
 
