@@ -33,7 +33,7 @@ const getCommentById = async (id: string) => {
   );
 };
 
-const getCommentsByPostId = async (listingId: string) => {
+const getCommentsByListingId = async (listingId: string) => {
   return await Comment.find({ listingId })
     .sort({ createdAt: -1 })
     .populate('author', 'firstName lastName imageUrl');
@@ -77,7 +77,7 @@ export default {
   getComments,
   createComment,
   getCommentById,
-  getCommentsByPostId,
+  getCommentsByListingId,
   updateComment,
   deleteComment,
 };
