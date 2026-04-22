@@ -5,4 +5,6 @@ export interface Comment {
   listingId: ObjectId | string;
   commentText: string;
   sender: ObjectId | string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

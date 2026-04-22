@@ -7,4 +7,6 @@ export interface User {
   phoneNumber: string;
   imageUrl: string;
   refreshToken: string[];
+  createdAt?: Date;
+  updatedAt?: Date;
 }
