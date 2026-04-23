@@ -78,7 +78,7 @@ const smartSearchListings = async (
 };
 
 const suggestImageDescription = async (filePath: string) => {
-  const fullPath = path.join(__dirname, '..', filePath);
+  const fullPath = path.join(process.cwd(), filePath);
   const fileData = fs.readFileSync(fullPath);
   const extention = path.extname(filePath).replace('.', '').toLowerCase();
   const base64Image = `data:image/${extention === 'jpg' ? 'jpeg' : extention};base64,${fileData.toString('base64')}`;
