@@ -1,40 +1,32 @@
 import { Request, Response } from 'express';
-import userService from '@/services/userService';
-import { AuthRequest } from '@/middlewares/authMiddleware';
+import userService from '../services/userService';
 
-const getUserById = async (req: Request, res: Response) => {
+const getUser = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id as string;
-    const user = await userService.getUserById(id);
-    if (!user) return res.status(404).json({ message: 'User not found' });
-
-    res.status(200).json(user);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
+    const user = await userService.getUserById(req.params.id as string);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.json(user);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
   }
 };
 
-const updateUser = async (req: AuthRequest, res: Response) => {
+const updateUser = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id as string;
-    const currentUserId = req.user?._id;
+    const updateData = { ...req.body };
 
-    if (id !== currentUserId) {
-      return res
-        .status(403)
-        .json({ message: 'You can only update your own profile' });
+    if (req.file) {
+      updateData.imageUrl = `/uploads/${req.file.filename}`;
     }
 
-    const updatedUser = await userService.updateUser(id, req.body);
-    if (!updatedUser)
-      return res.status(404).json({ message: 'User not found' });
-
-    res.status(200).json(updatedUser);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
+    const updatedUser = await userService.updateUser(
+      req.params.id as string,
+      updateData
+    );
+    res.json(updatedUser);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
   }
 };
 
-export default { getUserById, updateUser };
+export default { getUser, updateUser };
