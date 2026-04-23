@@ -5,13 +5,17 @@ const getUserById = async (id: string) => {
   return await UserModel.findById(id).select('-password -refreshToken');
 };
 
-const updateUser = async (id: string, userData: Partial<User>) => {
-  const { password, ...updateData } = userData;
+type UpdateUserPayload = Pick<
+  User,
+  'firstName' | 'lastName' | 'phoneNumber' | 'imageUrl'
+>;
 
-  return await UserModel.findByIdAndUpdate(id, updateData, {
-    new: true,
-    runValidators: true,
-  }).select('-password -refreshToken');
+const updateUser = async (id: string, updateData: UpdateUserPayload) => {
+  return await UserModel.findByIdAndUpdate(
+    id,
+    { $set: updateData },
+    { new: true, runValidators: true }
+  ).select('-password -refreshToken');
 };
 
 export default { getUserById, updateUser };

@@ -2,6 +2,7 @@ import UserModel from '../models/userModel';
 import { User as UserType } from '@/types/user';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import * as crypto from 'crypto';
 
 const generateTokens = (userId: string) => {
   const accessToken = jwt.sign(
@@ -20,7 +21,7 @@ const generateTokens = (userId: string) => {
 };
 
 const register = async (user: UserType) => {
-  const { email, password, firstName, lastName, phoneNumber, photo } = user;
+  const { email, password, firstName, lastName, phoneNumber, imageUrl } = user;
 
   const existingUser = await UserModel.findOne({ email });
   if (existingUser) {
@@ -36,7 +37,7 @@ const register = async (user: UserType) => {
     firstName,
     lastName,
     phoneNumber,
-    photo,
+    imageUrl,
   });
 
   return newUser;
@@ -61,6 +62,37 @@ const login = async (user: UserType) => {
   await foundUser.save();
 
   return { ...tokens, _id: foundUser._id };
+};
+
+const googleLogin = async (
+  email: string,
+  firstName: string,
+  lastName: string,
+  imageUrl: string
+) => {
+  let user = await UserModel.findOne({ email });
+
+  if (!user) {
+    const randomPassword = crypto.randomBytes(20).toString('hex');
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(randomPassword, salt);
+
+    user = await UserModel.create({
+      email,
+      firstName,
+      lastName,
+      password: hashedPassword,
+      imageUrl,
+    });
+  }
+
+  const tokens = generateTokens(user._id.toString());
+
+  if (!user.refreshToken) user.refreshToken = [];
+  user.refreshToken.push(tokens.refreshToken);
+  await user.save();
+
+  return { ...tokens, _id: user._id };
 };
 
 const logout = async (refreshToken: string) => {
@@ -99,4 +131,4 @@ const refresh = async (refreshToken: string) => {
   }
 };
 
-export default { register, login, logout, refresh };
+export default { register, login, googleLogin, logout, refresh };
