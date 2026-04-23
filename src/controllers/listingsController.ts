@@ -83,6 +83,22 @@ const deleteListing = async (req: Request, res: Response) => {
   }
 };
 
+const boostListing = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.body; // The ID of the user clicking the boost button
+    if (!userId)
+      return res.status(400).json({ error: 'User ID is required to boost' });
+
+    const updatedListing = await listingService.boostListing(
+      req.params.id as string,
+      userId
+    );
+    res.json(updatedListing);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 export default {
   getAllListings,
   getListing,
@@ -90,4 +106,5 @@ export default {
   createListing,
   updateListing,
   deleteListing,
+  boostListing,
 };
