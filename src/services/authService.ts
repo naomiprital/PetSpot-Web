@@ -68,6 +68,7 @@ const googleLogin = async (
   email: string,
   firstName: string,
   lastName: string,
+  phoneNumber: string,
   imageUrl: string
 ) => {
   let user = await UserModel.findOne({ email });
@@ -81,6 +82,7 @@ const googleLogin = async (
       email,
       firstName,
       lastName,
+      phoneNumber,
       password: hashedPassword,
       imageUrl,
     });

@@ -31,7 +31,7 @@ const googleLogin = async (req: Request, res: Response) => {
   try {
     // Note: In a production app, you would verify a Google Token here first.
     // Assuming your frontend has already verified the user and is sending the profile data:
-    const { email, firstName, lastName, imageUrl } = req.body;
+    const { email, firstName, lastName, phoneNumber, imageUrl } = req.body;
 
     if (!email || !firstName) {
       return res
@@ -43,6 +43,7 @@ const googleLogin = async (req: Request, res: Response) => {
       email,
       firstName,
       lastName,
+      phoneNumber,
       imageUrl || '/images/default-user-avatar.png'
     );
     res.status(200).json(user);
