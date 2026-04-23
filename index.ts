@@ -8,6 +8,7 @@ import { specs, swaggerUi } from '@/swagger';
 const envFile = process.env.NODE_ENV === 'test' ? '.env.test' : '.env.dev';
 dotenv.config({ path: envFile });
 const app = express();
+app.use(express.static('public'));
 const port = process.env.PORT || 8080;
 
 connectDB();
