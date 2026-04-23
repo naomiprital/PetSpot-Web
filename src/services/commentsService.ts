@@ -23,20 +23,23 @@ const createComment = async (
     { new: true }
   );
 
-  return await newComment.populate('author', 'firstName lastName imageUrl');
+  return await newComment.populate(
+    'author',
+    'firstName lastName email imageUrl phoneNumber'
+  );
 };
 
 const getCommentById = async (id: string) => {
   return await Comment.findById(id).populate(
     'author',
-    'firstName lastName imageUrl'
+    'firstName lastName email imageUrl phoneNumber'
   );
 };
 
 const getCommentsByListingId = async (listingId: string) => {
   return await Comment.find({ listingId })
     .sort({ createdAt: -1 })
-    .populate('author', 'firstName lastName imageUrl');
+    .populate('author', 'firstName lastName email imageUrl phoneNumber');
 };
 
 type UpdateCommentPayload = Pick<CommentType, 'commentText'>;
@@ -55,7 +58,7 @@ const updateComment = async (
     id,
     { $set: updateData },
     { new: true, runValidators: true }
-  ).populate('author', 'firstName lastName imageUrl');
+  ).populate('author', 'firstName lastName email imageUrl phoneNumber');
 };
 
 const deleteComment = async (id: string, authorId: string) => {
