@@ -3,10 +3,9 @@ import authService from '../services/authService';
 
 const register = async (req: Request, res: Response) => {
   try {
-    let imageUrl = '/images/default-user-avatar.png';
-    if (req.file) {
-      imageUrl = `/uploads/${req.file.filename}`;
-    }
+    const imageUrl = req.file
+      ? `/uploads/${req.file.filename}`
+      : '/images/default-user-avatar.png';
 
     const newUser = await authService.register({
       ...req.body,
@@ -44,7 +43,7 @@ const googleLogin = async (req: Request, res: Response) => {
       email,
       firstName,
       lastName,
-      imageUrl || ''
+      imageUrl || '/images/default-user-avatar.png'
     );
     res.status(200).json(user);
   } catch (error: any) {
