@@ -42,10 +42,10 @@ const updateComment = async (req: Request, res: Response) => {
 
 const deleteComment = async (req: Request, res: Response) => {
   try {
-    const { listingId } = req.body;
+    const { authorId } = req.body;
     const result = await commentService.deleteComment(
       req.params.id as string,
-      listingId
+      authorId
     );
     res.json(result);
   } catch (error: any) {
