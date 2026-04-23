@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import listingService from '../services/listingsService';
+import { AuthRequest } from '@/middlewares/authMiddleware';
 
 const getAllListings = async (req: Request, res: Response) => {
   try {
@@ -33,16 +34,17 @@ const getUserListings = async (req: Request, res: Response) => {
   }
 };
 
-const createListing = async (req: Request, res: Response) => {
+const createListing = async (req: AuthRequest, res: Response) => {
   try {
-    const { authorId, ...listingData } = req.body;
+    const authorId = req.user?._id;
+    const listingData = { ...req.body };
 
     listingData.imageUrl = req.file
       ? `/uploads/${req.file.filename}`
       : '/images/default-listing-image.jpg';
 
     const newListing = await listingService.createListing(
-      authorId,
+      authorId as string,
       listingData
     );
     res.status(201).json(newListing);
@@ -51,9 +53,10 @@ const createListing = async (req: Request, res: Response) => {
   }
 };
 
-const updateListing = async (req: Request, res: Response) => {
+const updateListing = async (req: AuthRequest, res: Response) => {
   try {
-    const { authorId, ...updateData } = req.body;
+    const authorId = req.user?._id;
+    const updateData = { ...req.body };
 
     if (req.file) {
       updateData.imageUrl = `/uploads/${req.file.filename}`;
@@ -61,7 +64,7 @@ const updateListing = async (req: Request, res: Response) => {
 
     const updatedListing = await listingService.updateListing(
       req.params.id as string,
-      authorId,
+      authorId as string,
       updateData
     );
     res.json(updatedListing);
@@ -70,30 +73,27 @@ const updateListing = async (req: Request, res: Response) => {
   }
 };
 
-const deleteListing = async (req: Request, res: Response) => {
+const deleteListing = async (req: AuthRequest, res: Response) => {
   try {
-    const { authorId } = req.body;
+    const authorId = req.user?._id;
+
     const result = await listingService.deleteListing(
       req.params.id as string,
-      authorId
+      authorId as string
     );
     res.json(result);
   } catch (error: any) {
     res.status(403).json({ error: error.message });
   }
 };
-
-const boostListing = async (req: Request, res: Response) => {
+const toggleBoostListing = async (req: AuthRequest, res: Response) => {
   try {
-    const { userId } = req.body; // The ID of the user clicking the boost button
-    if (!userId)
-      return res.status(400).json({ error: 'User ID is required to boost' });
+    const listingId = req.params.id as string;
+    const userId = req.user?._id as string;
 
-    const updatedListing = await listingService.boostListing(
-      req.params.id as string,
-      userId
-    );
-    res.json(updatedListing);
+    const updatedListing = await listingService.toggleBoost(listingId, userId);
+
+    res.status(200).json(updatedListing);
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
@@ -106,5 +106,5 @@ export default {
   createListing,
   updateListing,
   deleteListing,
-  boostListing,
+  toggleBoostListing,
 };

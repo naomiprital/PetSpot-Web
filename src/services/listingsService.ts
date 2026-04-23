@@ -104,17 +104,28 @@ const deleteListing = async (id: string, authorId: string) => {
   return { success: true, deletedListingId: id };
 };
 
-const boostListing = async (listingId: string, userId: string) => {
+const toggleBoost = async (listingId: string, userId: string) => {
   const listing = await Listing.findById(listingId);
-  if (!listing || listing.isDeleted) throw new Error('Listing not found');
 
-  const updatedListing = await Listing.findByIdAndUpdate(
-    listingId,
-    { $addToSet: { boosts: userId } },
-    { new: true }
-  ).populate('author', 'firstName lastName email phoneNumber imageUrl');
+  if (!listing || listing.isDeleted) {
+    throw new Error('Listing not found');
+  }
 
-  return updatedListing;
+  const hasBoosted = listing.boosts.some(id => id.toString() === userId);
+
+  if (hasBoosted) {
+    return await Listing.findByIdAndUpdate(
+      listingId,
+      { $pull: { boosts: userId } },
+      { new: true }
+    ).populate('author', 'firstName lastName email imageUrl phoneNumber');
+  } else {
+    return await Listing.findByIdAndUpdate(
+      listingId,
+      { $addToSet: { boosts: userId } },
+      { new: true }
+    ).populate('author', 'firstName lastName email imageUrl phoneNumber');
+  }
 };
 
 export default {
@@ -124,5 +135,5 @@ export default {
   createListing,
   updateListing,
   deleteListing,
-  boostListing,
+  toggleBoost,
 };
