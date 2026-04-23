@@ -109,8 +109,8 @@ const generateHiddenTags = async (filePath: string) => {
   try {
     const fullPath = path.join(__dirname, '..', filePath);
     const fileData = fs.readFileSync(fullPath);
-    const ext = path.extname(filePath).replace('.', '').toLowerCase();
-    const base64Image = `data:image/${ext === 'jpg' ? 'jpeg' : ext};base64,${fileData.toString('base64')}`;
+    const extention = path.extname(filePath).replace('.', '').toLowerCase();
+    const base64Image = `data:image/${extention === 'jpg' ? 'jpeg' : extention};base64,${fileData.toString('base64')}`;
 
     const content = [
       {
