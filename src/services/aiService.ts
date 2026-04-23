@@ -78,7 +78,7 @@ const smartSearchListings = async (
 };
 
 const suggestImageDescription = async (filePath: string) => {
-  const fullPath = path.join(__dirname, '..', filePath);
+  const fullPath = path.join(process.cwd(), filePath);
   const fileData = fs.readFileSync(fullPath);
   const extention = path.extname(filePath).replace('.', '').toLowerCase();
   const base64Image = `data:image/${extention === 'jpg' ? 'jpeg' : extention};base64,${fileData.toString('base64')}`;
@@ -107,7 +107,8 @@ const suggestImageDescription = async (filePath: string) => {
 
 const generateHiddenTags = async (filePath: string) => {
   try {
-    const fullPath = path.join(__dirname, '..', filePath);
+    const fullPath = path.join(process.cwd(), 'public', filePath);
+
     const fileData = fs.readFileSync(fullPath);
     const extention = path.extname(filePath).replace('.', '').toLowerCase();
     const base64Image = `data:image/${extention === 'jpg' ? 'jpeg' : extention};base64,${fileData.toString('base64')}`;
@@ -125,7 +126,13 @@ const generateHiddenTags = async (filePath: string) => {
     const data = await callCohereApi(content);
     return data?.message?.content?.[0]?.text ?? '';
   } catch (error) {
-    console.error('Failed to generate AI tags, skipping...', error);
+    console.error(
+      `Failed to generate AI tags. Tried looking at path: ${path.join(
+        process.cwd(),
+        'public',
+        filePath
+      )}, error:  + ${error}`
+    );
     return '';
   }
 };

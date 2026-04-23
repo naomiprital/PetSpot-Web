@@ -14,7 +14,7 @@ const authMiddleware = (
   const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
-    return res.status(401).send('Access Denied');
+    return res.status(401).send({ error: 'Access Denied' });
   }
 
   try {
@@ -24,7 +24,7 @@ const authMiddleware = (
     req.user = verified;
     next();
   } catch (err) {
-    res.status(401).send('Invalid Token');
+    res.status(401).send({ error: 'Invalid Token' });
   }
 };
 
