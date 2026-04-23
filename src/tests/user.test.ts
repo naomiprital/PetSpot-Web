@@ -47,7 +47,7 @@ describe('User API & Security', () => {
       password: 'password123',
     });
 
-    userAToken = loginA.body.token;
+    userAToken = loginA.body.accessToken;
   });
 
   test('GET /user/:id - should return user profile', async () => {

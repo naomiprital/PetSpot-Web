@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import userService from '../services/userService';
+import { AuthRequest } from '@/middlewares/authMiddleware';
 
 const getUser = async (req: Request, res: Response) => {
   try {
@@ -11,8 +12,17 @@ const getUser = async (req: Request, res: Response) => {
   }
 };
 
-const updateUser = async (req: Request, res: Response) => {
+const updateUser = async (req: AuthRequest, res: Response) => {
   try {
+    const userId = req.params.id;
+    const requestingUserId = req.user?._id;
+
+    if (userId !== requestingUserId) {
+      return res
+        .status(403)
+        .json({ error: 'You can only update your own profile' });
+    }
+
     const updateData = { ...req.body };
 
     if (req.file) {
@@ -20,7 +30,7 @@ const updateUser = async (req: Request, res: Response) => {
     }
 
     const updatedUser = await userService.updateUser(
-      req.params.id as string,
+      userId as string,
       updateData
     );
     res.json(updatedUser);

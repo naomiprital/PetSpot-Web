@@ -24,6 +24,21 @@ export const userData: UserData = {
   refreshToken: '',
 };
 
+export const testListing = {
+  title: 'Lost Dog',
+  type: 'lost',
+  animalType: 'dog',
+  location: {
+    type: 'Point',
+    coordinates: [34.7818, 32.0853],
+    address: 'Tel Aviv, Israel',
+  },
+  dateTimeOccured: new Date(),
+  description: 'A lost dog in the city',
+  imageUrl: 'http://example.com/photo1.jpg',
+  isResolved: false,
+};
+
 export const testPost = {
   _id: undefined,
   sender: 'testuser',
@@ -53,14 +68,14 @@ export const getLogedInUser = async (app: Express): Promise<UserData> => {
     lastName: lastName,
     phoneNumber: phoneNumber,
   });
-  const userPhoto = response.body.photo;
+  const userPhoto = response.body.imageUrl;
   response = await request(app)
     .post('/auth/login')
     .send({ email: email, password: password });
 
   const logedUser = {
     _id: response.body._id,
-    token: response.body.token,
+    token: response.body.accessToken,
     refreshToken: response.body.refreshToken,
     email: email,
     password: password,

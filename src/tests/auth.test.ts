@@ -2,7 +2,7 @@ import request from 'supertest';
 import app from '../../index';
 import mongoose from 'mongoose';
 import User from '../models/userModel';
-import { testPost, userData } from './utils';
+import { testListing, userData } from './utils';
 
 beforeAll(async () => {
   if (mongoose.connection.readyState === 0) {
@@ -16,8 +16,10 @@ afterAll(async () => {
 });
 
 describe('Auth API', () => {
-  test('POST /post - should be denied without token', async () => {
-    const response = await request(app).post('/post').send(testPost);
+  test('POST /listing - should be denied without token', async () => {
+    const response = await request(app)
+      .post('/listing')
+      .send({ ...testListing });
     expect(response.statusCode).toBe(401);
   });
 
@@ -43,11 +45,11 @@ describe('Auth API', () => {
     });
 
     expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty('token');
+    expect(response.body).toHaveProperty('accessToken');
     expect(response.body).toHaveProperty('refreshToken');
     expect(response.body).toHaveProperty('_id');
 
-    userData.token = response.body.token;
+    userData.token = response.body.accessToken;
     userData.refreshToken = response.body.refreshToken;
   });
 
@@ -55,28 +57,26 @@ describe('Auth API', () => {
     await new Promise(r => setTimeout(r, 6000));
 
     const failResponse = await request(app)
-      .post('/post')
+      .post('/listing')
       .set('Authorization', 'Bearer ' + userData.token)
-      .send(testPost);
+      .send({ authorId: userData._id, ...testListing });
     expect(failResponse.statusCode).toBe(401);
 
-    const refreshResponse = await request(app)
-      .post('/auth/refresh-token')
-      .send({
-        refreshToken: userData.refreshToken,
-      });
+    const refreshResponse = await request(app).post('/auth/refresh').send({
+      refreshToken: userData.refreshToken,
+    });
 
     expect(refreshResponse.statusCode).toBe(200);
-    expect(refreshResponse.body).toHaveProperty('token');
+    expect(refreshResponse.body).toHaveProperty('accessToken');
     expect(refreshResponse.body).toHaveProperty('refreshToken');
 
-    userData.token = refreshResponse.body.token;
+    userData.token = refreshResponse.body.accessToken;
     userData.refreshToken = refreshResponse.body.refreshToken;
 
     const successResponse = await request(app)
-      .post('/post')
+      .post('/listing')
       .set('Authorization', 'Bearer ' + userData.token)
-      .send(testPost);
+      .send({ authorId: userData._id, ...testListing });
     expect(successResponse.statusCode).not.toBe(401);
   }, 10000);
 
@@ -87,8 +87,8 @@ describe('Auth API', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  test('POST /auth/refresh-token - should block reused token', async () => {
-    const response = await request(app).post('/auth/refresh-token').send({
+  test('POST /auth/refresh - should block reused token', async () => {
+    const response = await request(app).post('/auth/refresh').send({
       refreshToken: userData.refreshToken,
     });
     expect(response.statusCode).toBe(401);

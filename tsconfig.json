@@ -7,9 +7,10 @@
     "esModuleInterop": true,
     "strict": true,
     "baseUrl": "./",
+    "types": ["jest", "node"],
     "paths": {
       "@/*": ["src/*"]
     }
   },
-  "include": ["src/**/*", "index.ts"]
+  "include": ["src/**/*", "index.ts", "jest.setup.ts"]
 }
