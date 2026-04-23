@@ -1,5 +1,6 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import { ANIMAL_TYPES, LISTING_TYPES } from './types/listing';
 
 const options: swaggerJsdoc.Options = {
   definition: {
@@ -29,7 +30,6 @@ const options: swaggerJsdoc.Options = {
         },
       },
       schemas: {
-        // ... (Your schemas remain exactly the same here)
         SmartSearchRequest: {
           type: 'object',
           required: ['query'],
@@ -59,7 +59,6 @@ const options: swaggerJsdoc.Options = {
         },
       },
     },
-    // THIS IS THE NEW PART: Defining the routes safely in JS!
     paths: {
       '/api/ai/smart-search': {
         post: {
@@ -107,7 +106,6 @@ const options: swaggerJsdoc.Options = {
           },
         },
       },
-      // --- AUTH ROUTES ---
       '/api/auth/register': {
         post: {
           summary: 'Register a new user',
@@ -224,7 +222,6 @@ const options: swaggerJsdoc.Options = {
           },
         },
       },
-      // --- COMMENTS ROUTES ---
       '/api/comments/{listingId}': {
         get: {
           summary: 'Get all comments for a specific listing',
@@ -363,7 +360,6 @@ const options: swaggerJsdoc.Options = {
           },
         },
       },
-      // --- LISTINGS ROUTES ---
       '/api/listings': {
         get: {
           summary: 'Get all active pet listings',
@@ -393,8 +389,8 @@ const options: swaggerJsdoc.Options = {
                   type: 'object',
                   properties: {
                     authorId: { type: 'string' },
-                    listingType: { type: 'string', enum: ['lost', 'found'] },
-                    animalType: { type: 'string' },
+                    listingType: { type: 'string', enum: LISTING_TYPES },
+                    animalType: { type: 'string', enum: ANIMAL_TYPES },
                     location: { type: 'string' },
                     description: { type: 'string' },
                     image: { type: 'string', format: 'binary' },
@@ -551,7 +547,6 @@ const options: swaggerJsdoc.Options = {
           },
         },
       },
-      // --- USERS ROUTES ---
       '/api/users/{id}': {
         get: {
           summary: 'Get user profile',
