@@ -47,6 +47,8 @@ const createListing = async (
 
   if (listingData.imageUrl) {
     aiTags = await aiService.generateHiddenTags(listingData.imageUrl);
+  } else {
+    aiTags = 'no image provided';
   }
 
   const newListing = await Listing.create({
@@ -72,7 +74,10 @@ const updateListing = async (
   if (listing.author.toString() !== authorId) throw new Error('Unauthorized');
 
   let newAiTags = listing.aiVisualTags;
-  if (updateData.imageUrl && updateData.imageUrl !== listing.imageUrl) {
+
+  if (!updateData.imageUrl && listing.imageUrl) {
+    newAiTags = 'no image provided';
+  } else if (updateData.imageUrl && updateData.imageUrl !== listing.imageUrl) {
     newAiTags = await aiService.generateHiddenTags(updateData.imageUrl);
   }
 
