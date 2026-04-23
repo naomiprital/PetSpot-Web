@@ -113,19 +113,11 @@ const toggleBoost = async (listingId: string, userId: string) => {
 
   const hasBoosted = listing.boosts.some(id => id.toString() === userId);
 
-  if (hasBoosted) {
-    return await Listing.findByIdAndUpdate(
-      listingId,
-      { $pull: { boosts: userId } },
-      { new: true }
-    ).populate('author', 'firstName lastName email imageUrl phoneNumber');
-  } else {
-    return await Listing.findByIdAndUpdate(
-      listingId,
-      { $addToSet: { boosts: userId } },
-      { new: true }
-    ).populate('author', 'firstName lastName email imageUrl phoneNumber');
-  }
+  return await Listing.findByIdAndUpdate(
+    listingId,
+    { [hasBoosted ? '$pull' : '$addToSet']: { boosts: userId } },
+    { new: true }
+  ).populate('author', 'firstName lastName email imageUrl phoneNumber');
 };
 
 export default {

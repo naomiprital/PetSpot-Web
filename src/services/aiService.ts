@@ -127,10 +127,12 @@ const generateHiddenTags = async (filePath: string) => {
     return data?.message?.content?.[0]?.text ?? '';
   } catch (error) {
     console.error(
-      'Failed to generate AI tags. Tried looking at path:',
-      path.join(process.cwd(), 'public', filePath)
+      `Failed to generate AI tags. Tried looking at path: ${path.join(
+        process.cwd(),
+        'public',
+        filePath
+      )}, error:  + ${error}`
     );
-    console.error(error);
     return '';
   }
 };
