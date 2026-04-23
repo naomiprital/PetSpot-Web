@@ -37,9 +37,9 @@ const createListing = async (req: Request, res: Response) => {
   try {
     const { authorId, ...listingData } = req.body;
 
-    if (req.file) {
-      listingData.imageUrl = `/uploads/${req.file.filename}`;
-    }
+    listingData.imageUrl = req.file
+      ? `/uploads/${req.file.filename}`
+      : '/images/default-listing-image.jpg';
 
     const newListing = await listingService.createListing(
       authorId,
