@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import commentService from '../services/commentsService';
+import { AuthRequest } from '@/middlewares/authMiddleware';
 
 const getComments = async (req: Request, res: Response) => {
   try {
@@ -12,12 +13,13 @@ const getComments = async (req: Request, res: Response) => {
   }
 };
 
-const createComment = async (req: Request, res: Response) => {
+const createComment = async (req: AuthRequest, res: Response) => {
   try {
-    const { authorId, commentText } = req.body;
+    const authorId = req.user?._id;
+    const { commentText } = req.body;
     const newComment = await commentService.createComment(
       req.params.listingId as string,
-      authorId,
+      authorId as string,
       commentText
     );
     res.status(201).json(newComment);
@@ -26,12 +28,13 @@ const createComment = async (req: Request, res: Response) => {
   }
 };
 
-const updateComment = async (req: Request, res: Response) => {
+const updateComment = async (req: AuthRequest, res: Response) => {
   try {
-    const { authorId, commentText } = req.body;
+    const authorId = req.user?._id;
+    const { commentText } = req.body;
     const updatedComment = await commentService.updateComment(
       req.params.id as string,
-      authorId,
+      authorId as string,
       { commentText }
     );
     res.json(updatedComment);
@@ -40,12 +43,12 @@ const updateComment = async (req: Request, res: Response) => {
   }
 };
 
-const deleteComment = async (req: Request, res: Response) => {
+const deleteComment = async (req: AuthRequest, res: Response) => {
   try {
-    const { authorId } = req.body;
+    const authorId = req.user?._id;
     const result = await commentService.deleteComment(
       req.params.id as string,
-      authorId
+      authorId as string
     );
     res.json(result);
   } catch (error: any) {
