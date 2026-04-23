@@ -1,6 +1,6 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-import { ANIMAL_TYPES, POST_TYPES } from './types/post';
+import { ANIMAL_TYPES, LISTING_TYPES } from './types/listing';
 
 const options: swaggerJsdoc.Options = {
   definition: {
@@ -9,7 +9,7 @@ const options: swaggerJsdoc.Options = {
       title: 'PetSpot REST API',
       version: '1.0.0',
       description:
-        'A REST API for managing PetSpot app, including posts, comments and user authentication.',
+        'A REST API for managing PetSpot app, including AI-powered lost pet search.',
       contact: {
         name: 'PetSpot Team',
         email: 'PetSpot@gmail.com',
@@ -27,375 +27,576 @@ const options: swaggerJsdoc.Options = {
           type: 'http',
           scheme: 'bearer',
           bearerFormat: 'JWT',
-          description: 'JWT authorization header using the Bearer scheme',
         },
       },
       schemas: {
-        User: {
+        SmartSearchRequest: {
           type: 'object',
-          required: [
-            'email',
-            'password',
-            'firstName',
-            'lastName',
-            'phoneNumber',
-            'photo',
-          ],
+          required: ['query'],
           properties: {
-            _id: {
-              type: 'string',
-              description: 'User unique identifier',
-              example: '507f1f77bcf86cd799439011',
-            },
-            email: {
-              type: 'string',
-              format: 'email',
-              description: 'User email address',
-              example: 'user@example.com',
-            },
-            password: {
-              type: 'string',
-              minLength: 6,
-              description: 'User password (hashed when stored)',
-              example: 'password123',
-            },
-            firstName: {
-              type: 'string',
-              description: 'User first name',
-              example: 'John',
-            },
-            lastName: {
-              type: 'string',
-              description: 'User last name',
-              example: 'Doe',
-            },
-            phoneNumber: {
-              type: 'string',
-              description: 'User phone number',
-              example: '+1234567890',
-            },
-            photo: {
-              type: 'string',
-              format: 'uri',
-              description: 'URL of the user profile photo',
-              example: 'assets/images/default-user-avatar.png',
-            },
-          },
-        },
-        Post: {
-          type: 'object',
-          required: [
-            'sender',
-            'type',
-            'animalType',
-            'description',
-            'location',
-            'dateTimeOccured',
-          ],
-          properties: {
-            _id: {
-              type: 'string',
-              description: 'Post unique identifier',
-              example: '507f1f77bcf86cd799439011',
-            },
-            sender: {
-              type: 'string',
-              description: 'ID of the user who created this post',
-              example: '507f1f77bcf86cd799439011',
-            },
-            animalType: {
-              type: 'string',
-              enum: ANIMAL_TYPES,
-              description: 'Type of animal',
-              example: 'dog',
-            },
-            location: {
-              type: 'object',
-              required: ['type', 'coordinates'],
-              properties: {
-                type: {
-                  type: 'string',
-                  enum: ['Point'],
-                  description: 'GeoJSON type',
-                  example: 'Point',
-                },
-                coordinates: {
-                  type: 'array',
-                  items: {
-                    type: 'number',
-                  },
-                  minItems: 2,
-                  maxItems: 2,
-                  description: 'GeoJSON coordinates',
-                  example: [102.0, 0.5],
-                },
-                address: {
-                  type: 'string',
-                  description: 'Human-readable address',
-                  example: '123 Pet Street, Pet City, PC 12345',
-                },
-              },
-            },
+            query: { type: 'string', example: 'large golden dog with spots' },
             type: {
               type: 'string',
-              enum: POST_TYPES,
-              description: 'Type of the post',
-              example: 'found',
+              enum: ['all', 'lost', 'found'],
+              default: 'all',
             },
-            dateTimeOccured: {
-              type: 'date-time',
-              format: 'date-time',
-              description: 'Date and time when the event occurred',
-              example: '2023-03-15T14:30:00Z',
+            animal: {
+              type: 'string',
+              enum: ['all', 'dog', 'cat', 'bird', 'other'],
+              default: 'all',
             },
+          },
+        },
+        AISuggestionResponse: {
+          type: 'object',
+          properties: {
             description: {
               type: 'string',
-              description: 'Description of the post',
-              example: 'White cat found near the park.',
+              example: 'A small white terrier with brown patches.',
             },
-            photos: {
-              type: 'array',
-              items: {
-                type: 'string',
-                format: 'uri',
-                description: 'URL of the photo',
-                example: '/images/default-user-avatar.png',
-              },
-            },
-            isResolved: {
-              type: 'boolean',
-              description: 'Indicates if the post has been resolved',
-              example: false,
-            },
-            likes: {
-              type: 'array',
-              items: {
-                type: 'string',
-                description: 'ID of the user who liked the post',
-                example: '507f1f77bcf86cd799439011',
-              },
-            },
-          },
-        },
-        Comment: {
-          type: 'object',
-          required: ['commentText', 'postId', 'sender'],
-          properties: {
-            _id: {
-              type: 'string',
-              description: 'Comment unique identifier',
-              example: '507f1f77bcf86cd799439011',
-            },
-            commentText: {
-              type: 'string',
-              description: 'Comment content',
-              example: 'Adorable!',
-            },
-            createdAt: {
-              type: 'string',
-              format: 'date-time',
-              description: 'Creation timestamp',
-            },
-            postId: {
-              type: 'string',
-              description: 'ID of the post this comment belongs to',
-              example: '507f1f77bcf86cd799439011',
-            },
-            sender: {
-              type: 'string',
-              description: 'ID of the user who wrote this comment',
-              example: '507f1f77bcf86cd799439011',
-            },
-          },
-        },
-        LoginRequest: {
-          type: 'object',
-          required: ['email', 'password'],
-          properties: {
-            email: {
-              type: 'string',
-              format: 'email',
-              example: 'user@example.com',
-            },
-            password: {
-              type: 'string',
-              example: 'password123',
-            },
-          },
-        },
-        RegisterRequest: {
-          type: 'object',
-          required: [
-            'email',
-            'password',
-            'firstName',
-            'lastName',
-            'phoneNumber',
-          ],
-          properties: {
-            email: {
-              type: 'string',
-              format: 'email',
-              example: 'user@example.com',
-            },
-            password: {
-              type: 'string',
-              minLength: 6,
-              example: 'password123',
-            },
-            firstName: {
-              type: 'string',
-              example: 'John',
-            },
-            lastName: {
-              type: 'string',
-              example: 'Doe',
-            },
-            phoneNumber: {
-              type: 'string',
-              example: '+1234567890',
-            },
-            photo: {
-              type: 'string',
-              format: 'uri',
-              example: '/images/default-user-avatar.png',
-            },
-          },
-        },
-        AuthResponse: {
-          type: 'object',
-          properties: {
-            accessToken: {
-              type: 'string',
-              description: 'JWT access token',
-              example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-            },
-            refreshToken: {
-              type: 'string',
-              description: 'JWT refresh token',
-              example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-            },
-          },
-        },
-        RefreshTokenRequest: {
-          type: 'object',
-          required: ['refreshToken'],
-          properties: {
-            refreshToken: {
-              type: 'string',
-              description: 'Valid refresh token',
-              example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-            },
-          },
-        },
-        Error: {
-          type: 'object',
-          properties: {
-            error: {
-              type: 'string',
-              description: 'Error message',
-              example: 'An error occurred',
-            },
-          },
-        },
-        ValidationError: {
-          type: 'object',
-          properties: {
-            error: {
-              type: 'string',
-              description: 'Validation error message',
-              example: 'Validation failed: Email is required',
-            },
-          },
-        },
-      },
-      responses: {
-        UnauthorizedError: {
-          description: 'Access token is missing or invalid',
-          content: {
-            'application/json': {
-              schema: {
-                $ref: '#/components/schemas/Error',
-              },
-              example: {
-                error: 'missing or invalid token',
-              },
-            },
-          },
-        },
-        NotFoundError: {
-          description: 'The specified resource was not found',
-          content: {
-            'application/json': {
-              schema: {
-                $ref: '#/components/schemas/Error',
-              },
-              example: {
-                error: 'Data not found',
-              },
-            },
-          },
-        },
-        ValidationError: {
-          description: 'Validation error',
-          content: {
-            'application/json': {
-              schema: {
-                $ref: '#/components/schemas/ValidationError',
-              },
-              example: {
-                error: 'Validation failed: ...',
-              },
-            },
-          },
-        },
-        ConflictError: {
-          description: 'Conflict error (e.g. duplicate key)',
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                properties: {
-                  error: {
-                    type: 'string',
-                    example: 'Unique constraint error',
-                  },
-                  keys: {
-                    type: 'array',
-                    items: {
-                      type: 'string',
-                    },
-                    example: ['email'],
-                  },
-                },
-              },
-            },
-          },
-        },
-        ServerError: {
-          description: 'Internal server error',
-          content: {
-            'application/json': {
-              schema: {
-                $ref: '#/components/schemas/Error',
-              },
-              example: {
-                error: 'Something went wrong, please try again later',
-              },
-            },
+            animalType: { type: 'string', example: 'dog' },
           },
         },
       },
     },
-    security: [
-      {
-        bearerAuth: [],
+    paths: {
+      '/api/ai/smart-search': {
+        post: {
+          summary: 'AI-powered listing search',
+          tags: ['AI'],
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/SmartSearchRequest' },
+              },
+            },
+          },
+          responses: {
+            '200': { description: 'Ranked search results' },
+          },
+        },
       },
-    ],
+      '/api/ai/suggest-description': {
+        post: {
+          summary: 'Analyze image to suggest description and animal type',
+          tags: ['AI'],
+          requestBody: {
+            required: true,
+            content: {
+              'multipart/form-data': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    image: { type: 'string', format: 'binary' },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            '200': {
+              description: 'AI suggestions',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/AISuggestionResponse' },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/api/auth/register': {
+        post: {
+          summary: 'Register a new user',
+          tags: ['Auth'],
+          requestBody: {
+            required: true,
+            content: {
+              'multipart/form-data': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    email: { type: 'string' },
+                    password: { type: 'string' },
+                    firstName: { type: 'string' },
+                    lastName: { type: 'string' },
+                    phoneNumber: { type: 'string' },
+                    image: { type: 'string', format: 'binary' },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            '201': {
+              description: 'User registered successfully',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/User' },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/api/auth/login': {
+        post: {
+          summary: 'Login user',
+          tags: ['Auth'],
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/LoginRequest' },
+              },
+            },
+          },
+          responses: {
+            '200': {
+              description: 'Login successful',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/AuthResponse' },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/api/auth/refresh': {
+        post: {
+          summary: 'Refresh access token',
+          tags: ['Auth'],
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/RefreshTokenRequest' },
+              },
+            },
+          },
+          responses: {
+            '200': { description: 'Tokens refreshed' },
+          },
+        },
+      },
+      '/api/auth/logout': {
+        post: {
+          summary: 'Logout user',
+          tags: ['Auth'],
+          responses: {
+            '200': { description: 'Logged out successfully' },
+          },
+        },
+      },
+      '/api/auth/google': {
+        post: {
+          summary: 'Login with Google',
+          tags: ['Auth'],
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    credential: {
+                      type: 'string',
+                      description: 'Google JWT credential or access token',
+                    },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            '200': {
+              description: 'Google login successful',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/AuthResponse' },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/api/comments/{listingId}': {
+        get: {
+          summary: 'Get all comments for a specific listing',
+          tags: ['Comments'],
+          parameters: [
+            {
+              in: 'path',
+              name: 'listingId',
+              required: true,
+              schema: { type: 'string' },
+            },
+          ],
+          responses: {
+            '200': {
+              description: 'List of comments',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'array',
+                    items: { $ref: '#/components/schemas/Comment' },
+                  },
+                },
+              },
+            },
+          },
+        },
+        post: {
+          summary: 'Add a comment to a listing',
+          tags: ['Comments'],
+          parameters: [
+            {
+              in: 'path',
+              name: 'listingId',
+              required: true,
+              schema: { type: 'string' },
+            },
+          ],
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  required: ['authorId', 'commentText'],
+                  properties: {
+                    authorId: { type: 'string' },
+                    commentText: { type: 'string' },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            '201': {
+              description: 'Comment created successfully',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/Comment' },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/api/comments/{id}': {
+        put: {
+          summary: 'Update a specific comment',
+          tags: ['Comments'],
+          parameters: [
+            {
+              in: 'path',
+              name: 'id',
+              required: true,
+              description: 'The ID of the comment to update',
+              schema: { type: 'string' },
+            },
+          ],
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  required: ['authorId', 'commentText'],
+                  properties: {
+                    authorId: {
+                      type: 'string',
+                      description: 'Used to verify ownership',
+                    },
+                    commentText: { type: 'string' },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            '200': { description: 'Comment updated successfully' },
+          },
+        },
+        delete: {
+          summary: 'Delete a specific comment',
+          tags: ['Comments'],
+          parameters: [
+            {
+              in: 'path',
+              name: 'id',
+              required: true,
+              description: 'The ID of the comment to delete',
+              schema: { type: 'string' },
+            },
+          ],
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  required: ['authorId', 'listingId'],
+                  properties: {
+                    authorId: {
+                      type: 'string',
+                      description: 'Used to verify ownership',
+                    },
+                    listingId: {
+                      type: 'string',
+                      description:
+                        'The ID of the listing the comment belongs to',
+                    },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            '200': { description: 'Comment deleted successfully' },
+          },
+        },
+      },
+      '/api/listings': {
+        get: {
+          summary: 'Get all active pet listings',
+          tags: ['Listings'],
+          responses: {
+            '200': {
+              description: 'A list of listings',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'array',
+                    items: { $ref: '#/components/schemas/Listing' },
+                  },
+                },
+              },
+            },
+          },
+        },
+        post: {
+          summary: 'Create a new pet listing',
+          tags: ['Listings'],
+          requestBody: {
+            required: true,
+            content: {
+              'multipart/form-data': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    authorId: { type: 'string' },
+                    listingType: { type: 'string', enum: LISTING_TYPES },
+                    animalType: { type: 'string', enum: ANIMAL_TYPES },
+                    location: { type: 'string' },
+                    description: { type: 'string' },
+                    image: { type: 'string', format: 'binary' },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            '201': {
+              description: 'Created',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/Listing' },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/api/listings/user/{authorId}': {
+        get: {
+          summary: 'Get all listings created by a specific user',
+          tags: ['Listings'],
+          parameters: [
+            {
+              in: 'path',
+              name: 'authorId',
+              required: true,
+              schema: { type: 'string' },
+              description: 'The ID of the author',
+            },
+          ],
+          responses: {
+            '200': {
+              description: "A list of the user's listings",
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'array',
+                    items: { $ref: '#/components/schemas/Listing' },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/api/listings/{id}': {
+        get: {
+          summary: 'Get a specific listing by ID',
+          tags: ['Listings'],
+          parameters: [
+            {
+              in: 'path',
+              name: 'id',
+              required: true,
+              schema: { type: 'string' },
+            },
+          ],
+          responses: {
+            '200': { description: 'The listing data' },
+            '404': { description: 'Listing not found' },
+          },
+        },
+        put: {
+          summary: 'Update an existing listing',
+          tags: ['Listings'],
+          parameters: [
+            {
+              in: 'path',
+              name: 'id',
+              required: true,
+              schema: { type: 'string' },
+            },
+          ],
+          requestBody: {
+            content: {
+              'multipart/form-data': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    authorId: { type: 'string' },
+                    description: { type: 'string' },
+                    image: { type: 'string', format: 'binary' },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            '200': { description: 'Updated successfully' },
+          },
+        },
+        delete: {
+          summary: 'Soft delete a listing',
+          tags: ['Listings'],
+          parameters: [
+            {
+              in: 'path',
+              name: 'id',
+              required: true,
+              schema: { type: 'string' },
+            },
+          ],
+          requestBody: {
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    authorId: { type: 'string' },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            '200': { description: 'Deleted successfully' },
+          },
+        },
+      },
+      '/api/listings/{id}/boost': {
+        put: {
+          summary: 'Boost a listing',
+          tags: ['Listings'],
+          parameters: [
+            {
+              in: 'path',
+              name: 'id',
+              required: true,
+              schema: { type: 'string' },
+            },
+          ],
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  required: ['userId'],
+                  properties: {
+                    userId: {
+                      type: 'string',
+                      description: 'The ID of the user boosting the post',
+                    },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            '200': { description: 'Listing boosted successfully' },
+          },
+        },
+      },
+      '/api/users/{id}': {
+        get: {
+          summary: 'Get user profile',
+          tags: ['Users'],
+          parameters: [
+            {
+              in: 'path',
+              name: 'id',
+              required: true,
+              schema: { type: 'string' },
+            },
+          ],
+          responses: {
+            '200': { description: 'User profile data' },
+          },
+        },
+        put: {
+          summary: 'Update user profile',
+          tags: ['Users'],
+          parameters: [
+            {
+              in: 'path',
+              name: 'id',
+              required: true,
+              schema: { type: 'string' },
+            },
+          ],
+          requestBody: {
+            content: {
+              'multipart/form-data': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    firstName: { type: 'string' },
+                    lastName: { type: 'string' },
+                    image: { type: 'string', format: 'binary' },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            '200': { description: 'Profile updated' },
+          },
+        },
+      },
+    },
   },
-  apis: ['./src/routes/*.ts', './src/controllers/*.ts'],
+  apis: ['./src/routes/*.ts'],
 };
 
 const specs = swaggerJsdoc(options);
-
 export { specs, swaggerUi };
