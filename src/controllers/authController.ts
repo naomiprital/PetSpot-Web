@@ -1,6 +1,9 @@
 import { Request, Response } from 'express';
 import authService from '../services/authService';
 
+const MAX_AGE_REFRESH_TOKEN_COOKIE = 7 * 24 * 60 * 60 * 1000;
+const MAX_AGE_ACCESS_TOKEN_COOKIE = 15 * 60 * 1000;
+
 const setCookies = (
   res: Response,
   accessToken: string,
@@ -12,14 +15,14 @@ const setCookies = (
     httpOnly: true,
     secure: isProd,
     sameSite: 'lax',
-    maxAge: 15 * 60 * 1000,
+    maxAge: MAX_AGE_ACCESS_TOKEN_COOKIE,
   });
 
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
     secure: isProd,
     sameSite: 'lax',
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    maxAge: MAX_AGE_REFRESH_TOKEN_COOKIE,
   });
 };
 
