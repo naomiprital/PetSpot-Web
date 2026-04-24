@@ -18,6 +18,13 @@ type UpdateListingPayload = Partial<CreateListingPayload> & {
 const getListings = async () => {
   return await Listing.find({ isDeleted: false })
     .populate('author', 'firstName lastName email phoneNumber imageUrl')
+    .populate({
+      path: 'comments',
+      populate: {
+        path: 'author',
+        select: 'firstName lastName email phoneNumber imageUrl',
+      },
+    })
     .sort({ createdAt: -1 });
 };
 
