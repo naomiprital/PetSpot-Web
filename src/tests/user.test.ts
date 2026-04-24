@@ -47,7 +47,7 @@ describe('User API & Security', () => {
       password: 'password123',
     });
 
-    userAToken = loginA.body.token;
+    userAToken = loginA.body.accessToken;
   });
 
   test('GET /user/:id - should return user profile', async () => {
@@ -81,7 +81,7 @@ describe('User API & Security', () => {
       email: 'hacker@test.com',
       password: 'password123',
     });
-    const hackerToken = loginB.body.token;
+    const hackerToken = loginB.body.accessToken;
 
     const response = await request(app)
       .put(`/user/${userAId}`)

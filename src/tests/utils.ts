@@ -60,7 +60,7 @@ export const getLogedInUser = async (app: Express): Promise<UserData> => {
 
   const logedUser = {
     _id: response.body._id,
-    token: response.body.token,
+    token: response.body.accessToken,
     refreshToken: response.body.refreshToken,
     email: email,
     password: password,
