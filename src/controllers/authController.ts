@@ -87,8 +87,8 @@ const googleLogin = async (req: Request, res: Response) => {
 
     const user = await authService.googleLogin(
       email,
-      payload?.given_name || 'Google User',
-      payload?.family_name || '',
+      payload?.given_name || 'Google',
+      payload?.family_name || 'User',
       req.body.phoneNumber, // Google doesn't provide phone number in the token
       imageUrl
     );
