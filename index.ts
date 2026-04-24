@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import cors from 'cors';
 import express from 'express';
 import dotenv from 'dotenv';
 import connectDB from './src/config/connect';
@@ -8,6 +9,12 @@ import { specs, swaggerUi } from '@/swagger';
 const envFile = process.env.NODE_ENV === 'test' ? '.env.test' : '.env.dev';
 dotenv.config({ path: envFile });
 const app = express();
+app.use(
+  cors({
+    origin: 'http://localhost:5173', // todo: when we have profuction add the prod url
+    credentials: true,
+  })
+);
 app.use(express.static('public'));
 const port = process.env.PORT || 8080;
 
