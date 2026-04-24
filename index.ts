@@ -5,10 +5,12 @@ import dotenv from 'dotenv';
 import connectDB from './src/config/connect';
 import router from '@/routes/router';
 import { specs, swaggerUi } from '@/swagger';
+import cookieParser from 'cookie-parser';
 
 const envFile = process.env.NODE_ENV === 'test' ? '.env.test' : '.env.dev';
 dotenv.config({ path: envFile });
 const app = express();
+app.use(cookieParser());
 app.use(
   cors({
     origin: 'http://localhost:5173', // todo: when we have profuction add the prod url
