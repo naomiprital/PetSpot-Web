@@ -59,9 +59,9 @@ const login = async (user: UserType) => {
 
   if (!foundUser.refreshToken) foundUser.refreshToken = [];
   foundUser.refreshToken.push(tokens.refreshToken);
-  await foundUser.save();
+  const savedUser = await foundUser.save();
 
-  return { ...tokens, _id: foundUser._id };
+  return { ...tokens, user: savedUser };
 };
 
 const googleLogin = async (
@@ -92,9 +92,9 @@ const googleLogin = async (
 
   if (!user.refreshToken) user.refreshToken = [];
   user.refreshToken.push(tokens.refreshToken);
-  await user.save();
+  const savedUser = await user.save();
 
-  return { ...tokens, _id: user._id };
+  return { ...tokens, user: savedUser };
 };
 
 const logout = async (refreshToken: string) => {
