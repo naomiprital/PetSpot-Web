@@ -5,7 +5,7 @@ const register = async (req: Request, res: Response) => {
   try {
     const imageUrl = req.file
       ? `/uploads/${req.file.filename}`
-      : '/images/default-user-avatar.png';
+      : '/images/default-user-avatar.jpg';
 
     const newUser = await authService.register({
       ...req.body,
@@ -44,7 +44,7 @@ const googleLogin = async (req: Request, res: Response) => {
       firstName,
       lastName,
       phoneNumber,
-      imageUrl || '/images/default-user-avatar.png'
+      imageUrl || '/images/default-user-avatar.jpg'
     );
     res.status(200).json(user);
   } catch (error: any) {

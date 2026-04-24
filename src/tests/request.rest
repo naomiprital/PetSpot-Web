@@ -28,7 +28,7 @@ Content-Type: application/json
     "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTdkZmRkM2QxYzRiOGFmNzM0ZTEwNWIiLCJpYXQiOjE3Njk4NjQ2NjcsImV4cCI6MTc2OTg2ODI2N30.YuEGTrMSB_6ymOxmCQ-kFJc7CZaSd5p2-t3GmtSufUU"
 }
 ### 4. Test logout by refreshing token (Should Fail)
-POST http://localhost:8080/auth/refresh-token
+POST http://localhost:8080/auth/refresh
 Content-Type: application/json
 
 {
@@ -50,7 +50,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTdlMTFhM
 }
 
 ### 6. Create a Post
-POST http://localhost:8080/post
+POST http://localhost:8080/listing
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTdkZmRkM2QxYzRiOGFmNzM0ZTEwNWIiLCJpYXQiOjE3Njk4NjQ3OTQsImV4cCI6MTc2OTg2ODM5NH0.uYmE3FQpuLelBEmgAHRBnx6zWzCb0sh0FJrnKDAFw_U
 
@@ -64,10 +64,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTdkZmRkM
 }
 
 ### 6.5. Get all posts (To find the ID)
-GET http://localhost:8080/post
+GET http://localhost:8080/listing
 
 ### 7. Update your Post
-PUT http://localhost:8080/post/697dfe79d1c4b8af734e106a
+PUT http://localhost:8080/listing/697dfe79d1c4b8af734e106a
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTdkZmRkM2QxYzRiOGFmNzM0ZTEwNWIiLCJpYXQiOjE3Njk4NjQ3OTQsImV4cCI6MTc2OTg2ODM5NH0.uYmE3FQpuLelBEmgAHRBnx6zWzCb0sh0FJrnKDAFw_U
 
