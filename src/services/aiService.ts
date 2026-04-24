@@ -68,7 +68,15 @@ const smartSearchListings = async (
 
   const populatedListings = await Listing.find({
     _id: { $in: matchedIds },
-  }).populate('author', 'firstName lastName email phoneNumber imageUrl');
+  })
+    .populate('author', 'firstName lastName email phoneNumber imageUrl')
+    .populate({
+      path: 'comments',
+      populate: {
+        path: 'author',
+        select: 'firstName lastName email phoneNumber imageUrl',
+      },
+    });
 
   return populatedListings.sort(
     (a, b) =>
