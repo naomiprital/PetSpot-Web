@@ -117,19 +117,21 @@ const googleLogin = async (req: Request, res: Response) => {
       }
     }
 
-    const user = await authService.googleLogin(
+    const { accessToken, refreshToken, user } = await authService.googleLogin(
       email,
       payload?.given_name || 'Google',
       payload?.family_name || 'User',
-      req.body.phoneNumber, // Google doesn't provide phone number in the token
+      req.body.phoneNumber,
       imageUrl
     );
+
+    setCookies(res, accessToken, refreshToken);
+
     res.status(200).json(user);
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
 };
-
 const logout = async (req: Request, res: Response) => {
   try {
     const refreshToken = req.cookies?.refreshToken;
