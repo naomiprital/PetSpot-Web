@@ -1,11 +1,15 @@
 import { jest, test, expect, describe, beforeAll, afterAll } from '@jest/globals';
 import request from 'supertest';
-import app from '../../index';
+import { Express } from 'express';
+import initApp from '../index';
 import mongoose from 'mongoose';
 import User from '../models/userModel';
 import { testListing, userData, MONGO_URI_TEST } from './utils';
 
+let app: Express;
+
 beforeAll(async () => {
+  app = await initApp();
   if (mongoose.connection.readyState === 0) {
     await mongoose.connect(process.env.MONGODB_URI || MONGO_URI_TEST);
   }
