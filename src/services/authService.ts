@@ -106,7 +106,7 @@ const logout = async (refreshToken: string) => {
   const user = await UserModel.findOne({ refreshToken: refreshToken });
   if (!user) return;
 
-  user.refreshToken = user.refreshToken.filter(t => t !== refreshToken);
+  user.refreshToken = user.refreshToken.filter(token => token !== refreshToken);
   await user.save();
 };
 
