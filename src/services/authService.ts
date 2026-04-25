@@ -1,8 +1,8 @@
 import UserModel from '../models/userModel';
-import { User as UserType } from '@/types/user';
+import { User as UserType } from '../types/user';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import * as crypto from 'crypto';
+import * as crypto from 'crypto'; 
 
 const generateTokens = (userId: string) => {
   const accessToken = jwt.sign(
@@ -38,7 +38,7 @@ const register = async (user: UserType) => {
     lastName,
     phoneNumber,
     imageUrl,
-  });
+  }) as any;
 
   const tokens = generateTokens(newUser._id.toString());
 
@@ -53,7 +53,9 @@ const login = async (user: UserType) => {
 
   if (!email || !password) throw new Error('Email and password are required');
 
-  const foundUser = await UserModel.findOne({ email }).select('+password');
+  const foundUser = (await UserModel.findOne({ email }).select(
+    '+password'
+  )) as any;
 
   if (!foundUser) throw new Error('Invalid email or password');
 
@@ -76,21 +78,21 @@ const googleLogin = async (
   phoneNumber: string,
   imageUrl: string
 ) => {
-  let user = await UserModel.findOne({ email });
+  let user = (await UserModel.findOne({ email })) as any;
 
   if (!user) {
     const randomPassword = crypto.randomBytes(20).toString('hex');
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(randomPassword, salt);
 
-    user = await UserModel.create({
+    user = (await UserModel.create({
       email,
       firstName,
       lastName,
       phoneNumber,
       password: hashedPassword,
       imageUrl,
-    });
+    })) as any;
   }
 
   const tokens = generateTokens(user._id.toString());
@@ -103,10 +105,10 @@ const googleLogin = async (
 };
 
 const logout = async (refreshToken: string) => {
-  const user = await UserModel.findOne({ refreshToken: refreshToken });
+  const user = (await UserModel.findOne({ refreshToken: refreshToken })) as any;
   if (!user) return;
 
-  user.refreshToken = user.refreshToken.filter(token => token !== refreshToken);
+  user.refreshToken = user.refreshToken.filter((token: string) => token !== refreshToken);
   await user.save();
 };
 
@@ -117,7 +119,7 @@ const refresh = async (refreshToken: string) => {
       process.env.REFRESH_TOKEN_SECRET as string
     ) as { _id: string };
 
-    const user = await UserModel.findById(decoded._id);
+    const user = (await UserModel.findById(decoded._id)) as any;
     if (!user) throw new Error('User not found');
 
     if (!user.refreshToken.includes(refreshToken)) {
@@ -128,7 +130,7 @@ const refresh = async (refreshToken: string) => {
 
     const tokens = generateTokens(user._id.toString());
 
-    user.refreshToken = user.refreshToken.filter(t => t !== refreshToken);
+    user.refreshToken = user.refreshToken.filter((token: string) => token !== refreshToken);
     user.refreshToken.push(tokens.refreshToken);
     await user.save();
 

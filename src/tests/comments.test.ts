@@ -1,17 +1,22 @@
 import { describe, test, expect, beforeAll, afterAll } from '@jest/globals';
 import mongoose from 'mongoose';
 import request from 'supertest';
-import { getLogedInUser, testListing, UserData, MONGO_URI_TEST } from './utils';
-import app from '../../index';
+import { getLogedInUser, MONGO_URI_TEST, testListing, UserData } from './utils';
+import { Express } from 'express';
+import initApp from '..';
 
 let loginUser: UserData;
+let app: Express;
 let listingId: string;
+
 const commentData = {
   _id: undefined,
   commentText: 'Test comment',
 };
 
 beforeAll(async () => {
+  app = await initApp();
+
   if (mongoose.connection.readyState === 0) {
     await mongoose.connect(process.env.MONGODB_URI || MONGO_URI_TEST);
   }

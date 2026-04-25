@@ -1,7 +1,7 @@
 import express from 'express';
 import listingsController from '../controllers/listingsController';
 import upload from '../middlewares/upload';
-import authMiddleware from '@/middlewares/authMiddleware';
+import authMiddleware from '../middlewares/authMiddleware';
 
 const router = express.Router();
 

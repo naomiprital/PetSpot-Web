@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-import { ANIMAL_TYPES, Listing, LISTING_TYPES } from '@/types/listing';
+import { ANIMAL_TYPES, Listing, LISTING_TYPES } from '../types/listing';
 
 const listingSchema = new Schema<Listing>(
   {
