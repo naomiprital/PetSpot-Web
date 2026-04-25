@@ -22,4 +22,5 @@ logs/
 
 # Build
 dist/
+build/
 

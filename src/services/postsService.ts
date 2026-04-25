@@ -1,5 +1,5 @@
-import Post from '@/models/postModel';
-import { Post as PostType } from '@/types/post';
+import Post from '../models/postModel';
+import { Post as PostType } from '../types/post';
 
 const getPosts = async () => {
   return await Post.find();

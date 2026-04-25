@@ -1,5 +1,5 @@
 import request from 'supertest';
-import app from '../../index';
+import app from '../index';
 import mongoose from 'mongoose';
 import User from '../models/userModel';
 import { testPost, userData } from './utils';
