@@ -22,10 +22,11 @@ const userSchema = new Schema<User>(
     },
     phoneNumber: {
       type: String,
+      required: true,
     },
     imageUrl: {
       type: String,
-      default: '/images/default-user-avatar.png',
+      default: '/images/default-user-avatar.jpg',
     },
     refreshToken: {
       type: [String],

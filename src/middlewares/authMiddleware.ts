@@ -10,11 +10,10 @@ const authMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  const token = req.cookies?.accessToken;
 
   if (!token) {
-    return res.status(401).send('Access Denied');
+    return res.status(401).send({ error: 'Access Denied' });
   }
 
   try {
@@ -24,7 +23,7 @@ const authMiddleware = (
     req.user = verified;
     next();
   } catch (err) {
-    res.status(401).send('Invalid Token');
+    res.status(401).send({ error: 'Invalid Token' });
   }
 };
 

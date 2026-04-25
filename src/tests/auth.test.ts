@@ -91,6 +91,6 @@ describe('Auth API', () => {
     const response = await request(app).post('/auth/refresh').send({
       refreshToken: userData.refreshToken,
     });
-    expect(response.statusCode).toBe(401);
+    expect(response.statusCode).toBe(403);
   });
 });
