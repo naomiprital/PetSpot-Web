@@ -1,3 +1,4 @@
+import { describe, test, expect, beforeAll, afterAll } from '@jest/globals';
 import mongoose from 'mongoose';
 import request from 'supertest';
 import { getLogedInUser, testListing, UserData, MONGO_URI_TEST } from './utils';
@@ -14,10 +15,10 @@ beforeAll(async () => {
   if (mongoose.connection.readyState === 0) {
     await mongoose.connect(process.env.MONGODB_URI || MONGO_URI_TEST);
   }
+  
   loginUser = await getLogedInUser(app);
-
   const listingResponse = await request(app)
-    .post('/listing')
+    .post('/api/listing')
     .set('Cookie', [`accessToken=${loginUser.token}`])
     .send({ authorId: loginUser._id, ...testListing });
   listingId = listingResponse.body._id;
@@ -29,14 +30,14 @@ afterAll(async () => {
 
 describe('Comments API Tests', () => {
   test('Get Comments - should retrieve all comments for a listing', async () => {
-    const response = await request(app).get(`/comment/${listingId}`);
+    const response = await request(app).get(`/api/comment/${listingId}`);
     expect(response.statusCode).toBe(200);
     expect(Array.isArray(response.body)).toBe(true);
   });
 
   test('Create Comment - should create a new comment with valid token', async () => {
     const response = await request(app)
-      .post(`/comment/${listingId}`)
+      .post(`/api/comment/${listingId}`)
       .set('Cookie', [`accessToken=${loginUser.token}`])
       .send({
         authorId: loginUser._id,
@@ -51,7 +52,7 @@ describe('Comments API Tests', () => {
 
   test('Create Comment - should be denied with invalid token', async () => {
     const response = await request(app)
-      .post(`/comment/${listingId}`)
+      .post(`/api/comment/${listingId}`)
       .set('Cookie', [`accessToken=${loginUser.token}junk`])
       .send({
         authorId: loginUser._id,
@@ -64,7 +65,7 @@ describe('Comments API Tests', () => {
     const updatedText = 'Updated test comment';
     if (!commentData._id) {
       const createResponse = await request(app)
-        .post(`/comment/${listingId}`)
+        .post(`/api/comment/${listingId}`)
         .set('Cookie', [`accessToken=${loginUser.token}`])
         .send({
           authorId: loginUser._id,
@@ -74,7 +75,7 @@ describe('Comments API Tests', () => {
     }
 
     const response = await request(app)
-      .put(`/comment/${commentData._id}`)
+      .put(`/api/comment/${commentData._id}`)
       .set('Cookie', [`accessToken=${loginUser.token}`])
       .send({
         authorId: loginUser._id,
@@ -87,7 +88,7 @@ describe('Comments API Tests', () => {
   test('Delete Comment - should delete a comment with valid token', async () => {
     if (!commentData._id) {
       const createResponse = await request(app)
-        .post(`/comment/${listingId}`)
+        .post(`/api/comment/${listingId}`)
         .set('Cookie', [`accessToken=${loginUser.token}`])
         .send({
           authorId: loginUser._id,
@@ -97,7 +98,7 @@ describe('Comments API Tests', () => {
     }
 
     const response = await request(app)
-      .delete(`/comment/${commentData._id}`)
+      .delete(`/api/comment/${commentData._id}`)
       .set('Cookie', [`accessToken=${loginUser.token}`])
       .send({ listingId: listingId });
     expect(response.statusCode).toBe(200);

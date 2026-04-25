@@ -1,3 +1,4 @@
+import { jest, test, expect, describe, beforeAll, afterAll } from '@jest/globals';
 import request from 'supertest';
 import app from '../../index';
 import mongoose from 'mongoose';
@@ -16,15 +17,15 @@ afterAll(async () => {
 });
 
 describe('Auth API', () => {
-  test('POST /listing - should be denied without token', async () => {
+  test('POST /api/listing - should be denied without token', async () => {
     const response = await request(app)
-      .post('/listing')
+      .post('/api/listing')
       .send({ ...testListing });
     expect(response.statusCode).toBe(401);
   });
 
-  test('POST /auth/register - should register new user', async () => {
-    const response = await request(app).post('/auth/register').send({
+  test('POST /api/auth/register - should register new user', async () => {
+    const response = await request(app).post('/api/auth/register').send({
       email: userData.email,
       password: userData.password,
       firstName: userData.firstName,
@@ -38,8 +39,8 @@ describe('Auth API', () => {
     userData._id = response.body._id;
   });
 
-  test('POST /auth/login - should return tokens', async () => {
-    const response = await request(app).post('/auth/login').send({
+  test('POST /api/auth/login - should return tokens', async () => {
+    const response = await request(app).post('/api/auth/login').send({
       email: userData.email,
       password: userData.password,
     });
@@ -75,7 +76,7 @@ describe('Auth API', () => {
 
   test('Test Token Expiration & Refresh', async () => {
     const refreshResponse = await request(app)
-      .post('/auth/refresh')
+      .post('/api/auth/refresh')
       .set('Cookie', [`refreshToken=${userData.refreshToken}`]);
 
     expect(refreshResponse.statusCode).toBe(200);
@@ -103,20 +104,20 @@ describe('Auth API', () => {
       : '';
 
     const successResponse = await request(app)
-      .post('/listing')
+      .post('/api/listing')
       .set('Cookie', [`accessToken=${userData.token}`])
       .send({ authorId: userData._id, ...testListing });
     expect(successResponse.statusCode).toBe(201);
   }, 10000);
 
-  test('POST /auth/logout - should logout', async () => {
+  test('POST /api/auth/logout - should logout', async () => {
     const response = await request(app)
-      .post('/auth/logout')
+      .post('/api/auth/logout')
       .set('Cookie', [`refreshToken=${userData.refreshToken}`]);
     expect(response.statusCode).toBe(200);
   });
 
-  test('POST /auth/google - should create or login user via Google', async () => {
+  test('POST /api/auth/google - should create or login user via Google', async () => {
     const { OAuth2Client } = await import('google-auth-library');
     jest
       .spyOn(OAuth2Client.prototype as any, 'verifyIdToken')
@@ -129,7 +130,7 @@ describe('Auth API', () => {
       }));
 
     const response = await request(app)
-      .post('/auth/google')
+      .post('/api/auth/google')
       .send({ credentials: { credential: 'fake-token' }, phoneNumber: '000' });
 
     expect(response.statusCode).toBe(200);
@@ -142,9 +143,9 @@ describe('Auth API', () => {
     expect(response.body).toHaveProperty('_id');
   });
 
-  test('POST /auth/refresh - should block reused token', async () => {
+  test('POST /api/auth/refresh - should block reused token', async () => {
     const response = await request(app)
-      .post('/auth/refresh')
+      .post('/api/auth/refresh')
       .set('Cookie', [`refreshToken=${userData.refreshToken}`]);
     expect(response.statusCode).toBe(403);
   });

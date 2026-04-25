@@ -1,3 +1,4 @@
+import { describe, test, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
 import request from 'supertest';
 import app from '../../index';
 import mongoose from 'mongoose';
@@ -22,7 +23,7 @@ describe('User API & Security', () => {
   beforeEach(async () => {
     await UserModel.deleteMany({});
 
-    const resA = await request(app).post('/auth/register').send({
+    const resA = await request(app).post('/api/auth/register').send({
       email: 'victim@test.com',
       password: 'password123',
       firstName: 'Victim',
@@ -32,7 +33,7 @@ describe('User API & Security', () => {
     });
     userAId = resA.body._id;
 
-    const resB = await request(app).post('/auth/register').send({
+    const resB = await request(app).post('/api/auth/register').send({
       email: 'hacker@test.com',
       password: 'password123',
       firstName: 'Hacker',
@@ -41,7 +42,7 @@ describe('User API & Security', () => {
     });
     userBId = resB.body._id;
 
-    const loginA = await request(app).post('/auth/login').send({
+    const loginA = await request(app).post('/api/auth/login').send({
       email: 'victim@test.com',
       password: 'password123',
     });
@@ -55,8 +56,8 @@ describe('User API & Security', () => {
     userAToken = accessA ? accessA.split(';')[0].split('=')[1] : '';
   });
 
-  test('GET /user/:id - should return user profile', async () => {
-    const response = await request(app).get(`/user/${userAId}`);
+  test('GET /api/user/:id - should return user profile', async () => {
+    const response = await request(app).get(`/api/user/${userAId}`);
 
     expect(response.statusCode).toBe(200);
     expect(response.body.firstName).toBe('Victim');
@@ -65,9 +66,9 @@ describe('User API & Security', () => {
     expect(response.body.password).toBeUndefined();
   });
 
-  test('PUT /user/:id - should allow user to update their OWN profile', async () => {
+  test('PUT /api/user/:id - should allow user to update their OWN profile', async () => {
     const response = await request(app)
-      .put(`/user/${userAId}`)
+      .put(`/api/user/${userAId}`)
       .set('Cookie', [`accessToken=${userAToken}`])
       .send({
         firstName: 'Updated',
@@ -81,8 +82,8 @@ describe('User API & Security', () => {
     expect(response.body.phoneNumber).toBe('9876543210');
   });
 
-  test('PUT /user/:id - should BLOCK a hacker from updating someone else', async () => {
-    const loginB = await request(app).post('/auth/login').send({
+  test('PUT /api/user/:id - should BLOCK a hacker from updating someone else', async () => {
+    const loginB = await request(app).post('/api/auth/login').send({
       email: 'hacker@test.com',
       password: 'password123',
     });
@@ -96,7 +97,7 @@ describe('User API & Security', () => {
     const hackerToken = accessB ? accessB.split(';')[0].split('=')[1] : '';
 
     const response = await request(app)
-      .put(`/user/${userAId}`)
+      .put(`/api/user/${userAId}`)
       .set('Cookie', [`accessToken=${hackerToken}`])
       .send({
         firstName: 'Hacked',

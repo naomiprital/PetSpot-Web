@@ -10,7 +10,7 @@
     "dev": "tsx watch index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "jest --detectOpenHandles",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles",
     "testAuth": "jest --runInBand --detectOpenHandles --forceExit ./src/tests/auth.test.ts",
     "testUsers": "jest --runInBand --detectOpenHandles --forceExit ./src/tests/user.test.ts",
     "testListing": "jest --runInBand --detectOpenHandles --forceExit ./src/tests/listings.test.ts",

@@ -1,6 +1,11 @@
+import { jest, test, expect, describe, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import fs from 'fs';
+import Listing from '../models/listingModel';
+import aiService from '../services/aiService';
 import { MONGO_URI_TEST } from './utils';
+
 dotenv.config({ path: '.env.test' });
 
 beforeAll(async () => {
@@ -10,44 +15,44 @@ beforeAll(async () => {
 });
 
 beforeEach(() => {
-  jest.resetModules();
   process.env = { ...process.env };
-  jest.unmock('../services/aiService');
+  jest.clearAllMocks();
+  // @ts-ignore
+  global.fetch = jest.fn();
+});
+
+afterEach(() => {
+  jest.restoreAllMocks();
 });
 
 afterAll(async () => {
   await mongoose.connection.close();
-  process.env = process.env;
 });
 
 describe('AI Service', () => {
   test('Generate hidden tags returns empty string when API key missing', async () => {
     delete process.env.COHERE_API_KEY;
 
-    jest.doMock('fs', () => ({ readFileSync: () => Buffer.from('fake') }));
-    const service = (await import('../services/aiService')).default;
-    const response = await service.generateHiddenTags(
-      '/images/nonexistent.jpg'
-    );
+    jest.spyOn(fs, 'readFileSync').mockReturnValue(Buffer.from('fake'));
+    
+    const response = await aiService.generateHiddenTags('/images/nonexistent.jpg');
     expect(response).toBe('');
   });
 
   test('Generate hidden tags returns tags when API responds', async () => {
     process.env.COHERE_API_KEY = 'test-key';
 
-    jest.doMock('fs', () => ({ readFileSync: () => Buffer.from('fake') }));
+    jest.spyOn(fs, 'readFileSync').mockReturnValue(Buffer.from('fake'));
+    
     // @ts-ignore
-    global.fetch = jest.fn(async () => ({
+    global.fetch.mockResolvedValue({
       ok: true,
       json: async () => ({
         message: { content: [{ text: 'ginger, white paws' }] },
       }),
-    }));
+    });
 
-    const service = (await import('../services/aiService')).default;
-    const response = await service.generateHiddenTags(
-      '/images/nonexistent.jpg'
-    );
+    const response = await aiService.generateHiddenTags('/images/nonexistent.jpg');
     expect(response).toBe('ginger, white paws');
   });
 
@@ -64,47 +69,43 @@ describe('AI Service', () => {
       { _id: 'id1', description: 'first', aiVisualTags: 'a', author: {} },
     ];
 
-    jest.doMock('../models/listingModel', () => ({
-      find: (arg: any) => {
-        if (arg && arg._id) {
-          return {
-            populate: () => ({
-              populate: () => Promise.resolve(populatedListings),
-            }),
-            sort: () => ({ limit: () => Promise.resolve(populatedListings) }),
-          };
-        }
-        return {
-          select: () => ({
-            sort: () => ({ limit: () => Promise.resolve(fakeListings) }),
-          }),
-        };
-      },
-    }));
-
-    jest.doMock('fs', () => ({ readFileSync: () => Buffer.from('fake') }));
-
+    const findSpy = jest.spyOn(Listing, 'find');
     // @ts-ignore
-    global.fetch = jest.fn(async () => ({
+    findSpy.mockReturnValueOnce({
+      select: () => ({
+        sort: () => ({ limit: () => Promise.resolve(fakeListings) }),
+      }),
+    } as any);
+    // @ts-ignore
+    findSpy.mockReturnValueOnce({
+      populate: () => ({
+        populate: () => Promise.resolve(populatedListings),
+      }),
+    } as any);
+
+    jest.spyOn(fs, 'readFileSync').mockReturnValue(Buffer.from('fake'));
+    // @ts-ignore
+    global.fetch.mockResolvedValue({
       ok: true,
       json: async () => ({
         message: { content: [{ text: JSON.stringify(['id2', 'id1']) }] },
       }),
-    }));
+    });
 
-    const service = (await import('../services/aiService')).default;
-    const response = await service.smartSearchListings('query');
+    const response = await aiService.smartSearchListings('query');
     expect(Array.isArray(response)).toBe(true);
     expect(response.length).toBe(2);
     expect(response[0]._id).toBe('id2');
     expect(response[1]._id).toBe('id1');
+    
+    findSpy.mockRestore();
   });
 
   test('Suggest image description parses JSON response', async () => {
     process.env.COHERE_API_KEY = 'test-key';
-    jest.doMock('fs', () => ({ readFileSync: () => Buffer.from('fake') }));
+    jest.spyOn(fs, 'readFileSync').mockReturnValue(Buffer.from('fake'));
     // @ts-ignore
-    global.fetch = jest.fn(async () => ({
+    global.fetch.mockResolvedValue({
       ok: true,
       json: async () => ({
         message: {
@@ -113,12 +114,9 @@ describe('AI Service', () => {
           ],
         },
       }),
-    }));
+    });
 
-    const service = (await import('../services/aiService')).default;
-    const response = await service.suggestImageDescription(
-      '/images/nonexistent.jpg'
-    );
+    const response = await aiService.suggestImageDescription('/images/nonexistent.jpg');
     expect(response).toHaveProperty('description', 'small brown dog');
     expect(response).toHaveProperty('animalType', 'dog');
   });

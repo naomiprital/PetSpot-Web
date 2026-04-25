@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import { Express } from 'express';
 import request from 'supertest';
 
@@ -47,7 +48,7 @@ export const getLogedInUser = async (app: Express): Promise<UserData> => {
   const lastName = userData.lastName;
   const phoneNumber = userData.phoneNumber;
 
-  let response = await request(app).post('/auth/register').send({
+  let response = await request(app).post('/api/auth/register').send({
     email: email,
     password: password,
     firstName: firstName,
@@ -58,7 +59,7 @@ export const getLogedInUser = async (app: Express): Promise<UserData> => {
   const userPhoto = response.body.imageUrl;
 
   response = await request(app)
-    .post('/auth/login')
+    .post('/api/auth/login')
     .send({ email: email, password: password });
 
   const rawSet = response.headers['set-cookie'];
