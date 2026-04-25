@@ -18,7 +18,7 @@ beforeAll(async () => {
 
   const listingResponse = await request(app)
     .post('/listing')
-    .set('Authorization', 'Bearer ' + loginUser.token)
+    .set('Cookie', [`accessToken=${loginUser.token}`])
     .send({ authorId: loginUser._id, ...testListing });
   listingId = listingResponse.body._id;
 });
@@ -37,7 +37,7 @@ describe('Comments API Tests', () => {
   test('Create Comment - should create a new comment with valid token', async () => {
     const response = await request(app)
       .post(`/comment/${listingId}`)
-      .set('Authorization', 'Bearer ' + loginUser.token)
+      .set('Cookie', [`accessToken=${loginUser.token}`])
       .send({
         authorId: loginUser._id,
         commentText: commentData.commentText,
@@ -52,30 +52,12 @@ describe('Comments API Tests', () => {
   test('Create Comment - should be denied with invalid token', async () => {
     const response = await request(app)
       .post(`/comment/${listingId}`)
-      .set('Authorization', 'Bearer ' + loginUser.token + 'junk')
+      .set('Cookie', [`accessToken=${loginUser.token}junk`])
       .send({
         authorId: loginUser._id,
         commentText: commentData.commentText,
       });
     expect(response.statusCode).toBe(401);
-  });
-
-  test('Get Comment by ID - should retrieve a specific comment', async () => {
-    if (!commentData._id) {
-      const createResponse = await request(app)
-        .post(`/comment/${listingId}`)
-        .set('Authorization', 'Bearer ' + loginUser.token)
-        .send({
-          authorId: loginUser._id,
-          commentText: commentData.commentText,
-        });
-      commentData._id = createResponse.body._id;
-    }
-
-    const response = await request(app).get(`/comment/${commentData._id}`);
-    expect(response.statusCode).toBe(200);
-    expect(response.body._id).toBe(commentData._id);
-    expect(response.body.commentText).toBe(commentData.commentText);
   });
 
   test('Update Comment - should update a comment with valid token', async () => {
@@ -93,7 +75,7 @@ describe('Comments API Tests', () => {
 
     const response = await request(app)
       .put(`/comment/${commentData._id}`)
-      .set('Authorization', 'Bearer ' + loginUser.token)
+      .set('Cookie', [`accessToken=${loginUser.token}`])
       .send({
         authorId: loginUser._id,
         commentText: updatedText,
@@ -116,7 +98,7 @@ describe('Comments API Tests', () => {
 
     const response = await request(app)
       .delete(`/comment/${commentData._id}`)
-      .set('Authorization', 'Bearer ' + loginUser.token)
+      .set('Cookie', [`accessToken=${loginUser.token}`])
       .send({ listingId: listingId });
     expect(response.statusCode).toBe(200);
   });

@@ -46,8 +46,14 @@ describe('User API & Security', () => {
       email: 'victim@test.com',
       password: 'password123',
     });
-
-    userAToken = loginA.body.accessToken;
+    const setCookiesA = loginA.headers['set-cookie'];
+    const cookiesA = Array.isArray(setCookiesA)
+      ? setCookiesA
+      : setCookiesA
+        ? [setCookiesA]
+        : [];
+    const accessA = cookiesA.find((c: string) => c.startsWith('accessToken='));
+    userAToken = accessA ? accessA.split(';')[0].split('=')[1] : '';
   });
 
   test('GET /user/:id - should return user profile', async () => {
@@ -63,7 +69,7 @@ describe('User API & Security', () => {
   test('PUT /user/:id - should allow user to update their OWN profile', async () => {
     const response = await request(app)
       .put(`/user/${userAId}`)
-      .set('Authorization', 'Bearer ' + userAToken)
+      .set('Cookie', [`accessToken=${userAToken}`])
       .send({
         firstName: 'Updated',
         lastName: 'Name',
@@ -81,11 +87,18 @@ describe('User API & Security', () => {
       email: 'hacker@test.com',
       password: 'password123',
     });
-    const hackerToken = loginB.body.accessToken;
+    const setCookiesB = loginB.headers['set-cookie'];
+    const cookiesB = Array.isArray(setCookiesB)
+      ? setCookiesB
+      : setCookiesB
+        ? [setCookiesB]
+        : [];
+    const accessB = cookiesB.find((c: string) => c.startsWith('accessToken='));
+    const hackerToken = accessB ? accessB.split(';')[0].split('=')[1] : '';
 
     const response = await request(app)
       .put(`/user/${userAId}`)
-      .set('Authorization', 'Bearer ' + hackerToken)
+      .set('Cookie', [`accessToken=${hackerToken}`])
       .send({
         firstName: 'Hacked',
         lastName: 'Hacker',

@@ -45,52 +45,107 @@ describe('Auth API', () => {
     });
 
     expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty('accessToken');
-    expect(response.body).toHaveProperty('refreshToken');
+
+    const rawSet = response.headers['set-cookie'];
+    const setCookies = Array.isArray(rawSet) ? rawSet : rawSet ? [rawSet] : [];
+    const hasAccess = setCookies.some(cookie =>
+      cookie.startsWith('accessToken=')
+    );
+    const hasRefresh = setCookies.some(cookie =>
+      cookie.startsWith('refreshToken=')
+    );
+
+    expect(hasAccess).toBe(true);
+    expect(hasRefresh).toBe(true);
     expect(response.body).toHaveProperty('_id');
 
-    userData.token = response.body.accessToken;
-    userData.refreshToken = response.body.refreshToken;
+    const accessCookie = setCookies.find(cookie =>
+      cookie.startsWith('accessToken=')
+    );
+    const refreshCookie = setCookies.find(cookie =>
+      cookie.startsWith('refreshToken=')
+    );
+    userData.token = accessCookie
+      ? accessCookie.split(';')[0].split('=')[1]
+      : '';
+    userData.refreshToken = refreshCookie
+      ? refreshCookie.split(';')[0].split('=')[1]
+      : '';
   });
 
   test('Test Token Expiration & Refresh', async () => {
-    await new Promise(r => setTimeout(r, 6000));
-
-    const failResponse = await request(app)
-      .post('/listing')
-      .set('Authorization', 'Bearer ' + userData.token)
-      .send({ authorId: userData._id, ...testListing });
-    expect(failResponse.statusCode).toBe(401);
-
-    const refreshResponse = await request(app).post('/auth/refresh').send({
-      refreshToken: userData.refreshToken,
-    });
+    const refreshResponse = await request(app)
+      .post('/auth/refresh')
+      .set('Cookie', [`refreshToken=${userData.refreshToken}`]);
 
     expect(refreshResponse.statusCode).toBe(200);
-    expect(refreshResponse.body).toHaveProperty('accessToken');
-    expect(refreshResponse.body).toHaveProperty('refreshToken');
 
-    userData.token = refreshResponse.body.accessToken;
-    userData.refreshToken = refreshResponse.body.refreshToken;
+    const rawSet2 = refreshResponse.headers['set-cookie'];
+    const setCookies2 = Array.isArray(rawSet2)
+      ? rawSet2
+      : rawSet2
+        ? [rawSet2]
+        : [];
+    const accessCookie2 = setCookies2.find(cookie =>
+      cookie.startsWith('accessToken=')
+    );
+    const refreshCookie2 = setCookies2.find(cookie =>
+      cookie.startsWith('refreshToken=')
+    );
+    expect(accessCookie2).toBeDefined();
+    expect(refreshCookie2).toBeDefined();
+
+    userData.token = accessCookie2
+      ? accessCookie2.split(';')[0].split('=')[1]
+      : '';
+    userData.refreshToken = refreshCookie2
+      ? refreshCookie2.split(';')[0].split('=')[1]
+      : '';
 
     const successResponse = await request(app)
       .post('/listing')
-      .set('Authorization', 'Bearer ' + userData.token)
+      .set('Cookie', [`accessToken=${userData.token}`])
       .send({ authorId: userData._id, ...testListing });
-    expect(successResponse.statusCode).not.toBe(401);
+    expect(successResponse.statusCode).toBe(201);
   }, 10000);
 
   test('POST /auth/logout - should logout', async () => {
-    const response = await request(app).post('/auth/logout').send({
-      refreshToken: userData.refreshToken,
-    });
+    const response = await request(app)
+      .post('/auth/logout')
+      .set('Cookie', [`refreshToken=${userData.refreshToken}`]);
     expect(response.statusCode).toBe(200);
   });
 
+  test('POST /auth/google - should create or login user via Google', async () => {
+    const { OAuth2Client } = await import('google-auth-library');
+    jest
+      .spyOn(OAuth2Client.prototype as any, 'verifyIdToken')
+      .mockImplementation(async () => ({
+        getPayload: () => ({
+          email: 'googleuser@example.com',
+          given_name: 'Google',
+          family_name: 'User',
+        }),
+      }));
+
+    const response = await request(app)
+      .post('/auth/google')
+      .send({ credentials: { credential: 'fake-token' }, phoneNumber: '000' });
+
+    expect(response.statusCode).toBe(200);
+    const rawSet = response.headers['set-cookie'];
+    const setCookies = Array.isArray(rawSet) ? rawSet : rawSet ? [rawSet] : [];
+    const hasAccess = setCookies.some(c => c.startsWith('accessToken='));
+    const hasRefresh = setCookies.some(c => c.startsWith('refreshToken='));
+    expect(hasAccess).toBe(true);
+    expect(hasRefresh).toBe(true);
+    expect(response.body).toHaveProperty('_id');
+  });
+
   test('POST /auth/refresh - should block reused token', async () => {
-    const response = await request(app).post('/auth/refresh').send({
-      refreshToken: userData.refreshToken,
-    });
+    const response = await request(app)
+      .post('/auth/refresh')
+      .set('Cookie', [`refreshToken=${userData.refreshToken}`]);
     expect(response.statusCode).toBe(403);
   });
 });

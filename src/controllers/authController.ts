@@ -81,7 +81,7 @@ const register = async (req: Request, res: Response) => {
 
 const login = async (req: Request, res: Response) => {
   try {
-    const { accessToken, refreshToken, ...user } = await authService.login(
+    const { accessToken, refreshToken, user } = await authService.login(
       req.body
     );
 

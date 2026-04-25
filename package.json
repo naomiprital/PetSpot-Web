@@ -12,9 +12,10 @@
     "start": "node dist/index.js",
     "test": "jest --detectOpenHandles",
     "testAuth": "jest --runInBand --detectOpenHandles --forceExit ./src/tests/auth.test.ts",
-    "testPosts": "jest --runInBand --detectOpenHandles --forceExit ./src/tests/posts.test.ts",
     "testUsers": "jest --runInBand --detectOpenHandles --forceExit ./src/tests/user.test.ts",
-    "testComments": "jest --runInBand --detectOpenHandles --forceExit ./src/tests/comments.test.ts"
+    "testListing": "jest --runInBand --detectOpenHandles --forceExit ./src/tests/listing.test.ts",
+    "testComments": "jest --runInBand --detectOpenHandles --forceExit ./src/tests/comments.test.ts",
+    "testAi": "jest --runInBand --detectOpenHandles --forceExit ./src/tests/ai.test.ts"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
