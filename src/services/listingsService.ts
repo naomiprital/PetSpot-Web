@@ -1,5 +1,5 @@
 import Listing from '../models/listingModel';
-import { Listing as ListingType } from '@/types/listing';
+import { Listing as ListingType } from '../types/listing';
 import aiService from './aiService';
 
 type CreateListingPayload = Pick<

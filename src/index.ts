@@ -3,25 +3,23 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import path from 'path';
-import { fileURLToPath } from 'url';
-
 import connectDB from './config/connect';
-import router from '@/routes/router';
-import { specs, swaggerUi } from '@/swagger';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import router from './routes/router';
+import { specs, swaggerUi } from './swagger';
 
 const envPath =
-  process.env.NODE_ENV === 'test'
-    ? '.env.test'
-    : process.env.NODE_ENV === 'development'
-      ? '.env.dev'
-      : '.env';
+process.env.NODE_ENV === 'test'
+? '.env.test'
+: process.env.NODE_ENV === 'development'
+? '.env.dev'
+: '.env';
 
 dotenv.config({ path: path.resolve(process.cwd(), envPath) });
 
 const app = express();
+
+const publicDir = path.join(__dirname, "../public");
+const uploadsDir = path.join(publicDir, "uploads");
 
 const initApp = (): Promise<Express> => {
   return new Promise<Express>(async (resolve, reject) => {
@@ -36,9 +34,8 @@ const initApp = (): Promise<Express> => {
           credentials: true,
         })
       );
-
-      const publicPath = path.join(__dirname, '..', 'public');
-      app.use(express.static(publicPath));
+      
+      app.use("/public", express.static(uploadsDir));
 
       app.use(
         '/api-docs',
@@ -53,7 +50,7 @@ const initApp = (): Promise<Express> => {
       app.use('/api', router);
 
       app.get(/.*/, (req, res) => {
-        res.sendFile(path.join(publicPath, 'index.html'));
+        res.sendFile(path.join(publicDir, 'index.html'));
       });
 
       await connectDB();

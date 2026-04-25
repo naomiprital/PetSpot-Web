@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import listingService from '../services/listingsService';
-import { AuthRequest } from '@/middlewares/authMiddleware';
+import { AuthRequest } from '../middlewares/authMiddleware';
 
 const getAllListings = async (req: Request, res: Response) => {
   try {
