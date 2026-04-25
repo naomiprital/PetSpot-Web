@@ -1,4 +1,4 @@
-import { Comment } from '@/types/comment';
+import { Comment } from '../types/comment';
 import mongoose from 'mongoose';
 
 const commentSchema = new mongoose.Schema<Comment>(

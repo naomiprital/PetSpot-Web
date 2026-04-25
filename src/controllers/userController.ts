@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import userService from '../services/userService';
-import { AuthRequest } from '@/middlewares/authMiddleware';
+import { AuthRequest } from '../middlewares/authMiddleware';
 
 const getUser = async (req: Request, res: Response) => {
   try {

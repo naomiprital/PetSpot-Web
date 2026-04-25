@@ -1,4 +1,4 @@
-import { ANIMAL_TYPES, Post, POST_TYPES } from '@/types/post';
+import { ANIMAL_TYPES, Post, POST_TYPES } from '../types/post';
 import mongoose from 'mongoose';
 
 const postSchema = new mongoose.Schema<Post>(

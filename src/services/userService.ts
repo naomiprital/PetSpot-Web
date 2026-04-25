@@ -1,5 +1,5 @@
 import UserModel from '../models/userModel';
-import { User } from '@/types/user';
+import { User } from '../types/user';
 
 const getUserById = async (id: string) => {
   return await UserModel.findById(id).select('-password -refreshToken');

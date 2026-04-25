@@ -1,11 +1,15 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
 import { getLogedInUser, testPost, UserData } from './utils';
-import app from '../../index';
+import { Express } from 'express';
+import initApp from '..';
 
 let loginUser: UserData;
+let app: Express;
 
 beforeAll(async () => {
+  app = await initApp();
+
   if (mongoose.connection.readyState === 0) {
     await mongoose.connect(process.env.DATABASE_URL as string);
   }

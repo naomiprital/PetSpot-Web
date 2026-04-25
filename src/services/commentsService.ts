@@ -1,6 +1,6 @@
-import Comment from '@/models/commentModel';
-import listingModel from '@/models/listingModel';
-import { Comment as CommentType } from '@/types/comment';
+import Comment from '../models/commentModel';
+import listingModel from '../models/listingModel';
+import { Comment as CommentType } from '../types/comment';
 
 const getComments = async () => {
   return await Comment.find().populate('author', 'firstName lastName imageUrl');
@@ -49,10 +49,9 @@ const updateComment = async (
   authorId: string,
   updateData: UpdateCommentPayload
 ) => {
-  const comment = await Comment.findById(id);
-
+  const comment = (await Comment.findById(id)) as any;
   if (!comment) throw new Error('Comment not found');
-  if (comment.author.toString() !== authorId) throw new Error('Unauthorized');
+  if (comment.author?.toString() !== authorId) throw new Error('Unauthorized');
 
   return await Comment.findByIdAndUpdate(
     id,
@@ -62,10 +61,10 @@ const updateComment = async (
 };
 
 const deleteComment = async (id: string, authorId: string) => {
-  const comment = await Comment.findById(id);
+  const comment = (await Comment.findById(id)) as any;
 
   if (!comment) throw new Error('Comment not found');
-  if (comment.author.toString() !== authorId) throw new Error('Unauthorized');
+  if (comment.author?.toString() !== authorId) throw new Error('Unauthorized');
 
   await Comment.findByIdAndDelete(id);
 

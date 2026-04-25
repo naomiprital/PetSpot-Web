@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import postsService from '@/services/postsService';
-import { AuthRequest } from '@/middlewares/authMiddleware';
+import postsService from '../services/postsService';
+import { AuthRequest } from '../middlewares/authMiddleware';
 
 const getPosts = async (req: Request, res: Response) => {
   try {
