@@ -6,6 +6,11 @@ import connectDB from './src/config/connect';
 import router from '@/routes/router';
 import { specs, swaggerUi } from '@/swagger';
 import cookieParser from 'cookie-parser';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const envFile = process.env.NODE_ENV === 'test' ? '.env.test' : '.env.dev';
 dotenv.config({ path: envFile });
@@ -17,7 +22,7 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 const port = process.env.PORT || 8080;
 
 connectDB();
@@ -39,10 +44,10 @@ app.get('/api-docs.json', (_, res) => {
   res.send(specs);
 });
 
-app.use('/', router);
+app.use('/api', router);
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello, World!');
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 if (process.env.NODE_ENV !== 'test') {
