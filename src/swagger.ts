@@ -57,6 +57,81 @@ const options: swaggerJsdoc.Options = {
             animalType: { type: 'string', example: 'dog' },
           },
         },
+        User: {
+          type: 'object',
+          properties: {
+            _id: { type: 'string' },
+            email: { type: 'string' },
+            firstName: { type: 'string' },
+            lastName: { type: 'string' },
+            phoneNumber: { type: 'string' },
+            imageUrl: { type: 'string' },
+          },
+        },
+        LoginRequest: {
+          type: 'object',
+          required: ['email', 'password'],
+          properties: {
+            email: { type: 'string', format: 'email' },
+            password: { type: 'string', format: 'password' },
+          },
+        },
+        AuthResponse: {
+          type: 'object',
+          properties: {
+            _id: { type: 'string' },
+            email: { type: 'string' },
+            accessToken: { type: 'string' },
+            refreshToken: { type: 'string' },
+          },
+        },
+        RefreshTokenRequest: {
+          type: 'object',
+          required: ['refreshToken'],
+          properties: {
+            refreshToken: { type: 'string' },
+          },
+        },
+        Comment: {
+          type: 'object',
+          properties: {
+            _id: { type: 'string' },
+            listingId: { type: 'string' },
+            commentText: { type: 'string' },
+            author: { $ref: '#/components/schemas/User' },
+            createdAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        Listing: {
+          type: 'object',
+          properties: {
+            _id: { type: 'string' },
+            listingType: { type: 'string', enum: LISTING_TYPES },
+            animalType: { type: 'string', enum: ANIMAL_TYPES },
+            imageUrl: { type: 'string' },
+            location: { type: 'string' },
+            lastSeen: { type: 'number' },
+            description: { type: 'string' },
+            author: { $ref: '#/components/schemas/User' },
+            comments: {
+              type: 'array',
+              items: { $ref: '#/components/schemas/Comment' },
+            },
+            boosts: {
+              type: 'array',
+              items: { type: 'string' },
+            },
+            aiVisualTags: { type: 'string' },
+            isResolved: { type: Boolean },
+            createdAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        Error: {
+          type: 'object',
+          properties: {
+            error: { type: 'string' },
+          },
+        },
       },
     },
     paths: {
@@ -177,7 +252,14 @@ const options: swaggerJsdoc.Options = {
             },
           },
           responses: {
-            '200': { description: 'Tokens refreshed' },
+            '400': {
+              description: 'Bad request',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/Error' },
+                },
+              },
+            },
           },
         },
       },
@@ -201,9 +283,19 @@ const options: swaggerJsdoc.Options = {
                 schema: {
                   type: 'object',
                   properties: {
-                    credential: {
+                    credentials: {
+                      type: 'object',
+                      properties: {
+                        credential: {
+                          type: 'string',
+                          description: 'Google JWT credential or access token',
+                        },
+                      },
+                    },
+                    phoneNumber: {
                       type: 'string',
-                      description: 'Google JWT credential or access token',
+                      description: "The user's phone number",
+                      example: '0501234567',
                     },
                   },
                 },
@@ -222,7 +314,7 @@ const options: swaggerJsdoc.Options = {
           },
         },
       },
-      '/api/comments/{listingId}': {
+      '/api/comment/{listingId}': {
         get: {
           summary: 'Get all comments for a specific listing',
           tags: ['Comments'],
@@ -286,7 +378,7 @@ const options: swaggerJsdoc.Options = {
           },
         },
       },
-      '/api/comments/{id}': {
+      '/api/comment/{id}': {
         put: {
           summary: 'Update a specific comment',
           tags: ['Comments'],
@@ -360,7 +452,7 @@ const options: swaggerJsdoc.Options = {
           },
         },
       },
-      '/api/listings': {
+      '/api/listing': {
         get: {
           summary: 'Get all active pet listings',
           tags: ['Listings'],
@@ -411,7 +503,7 @@ const options: swaggerJsdoc.Options = {
           },
         },
       },
-      '/api/listings/user/{authorId}': {
+      '/api/listing/user/{authorId}': {
         get: {
           summary: 'Get all listings created by a specific user',
           tags: ['Listings'],
@@ -439,7 +531,7 @@ const options: swaggerJsdoc.Options = {
           },
         },
       },
-      '/api/listings/{id}': {
+      '/api/listing/{id}': {
         get: {
           summary: 'Get a specific listing by ID',
           tags: ['Listings'],
@@ -453,7 +545,14 @@ const options: swaggerJsdoc.Options = {
           ],
           responses: {
             '200': { description: 'The listing data' },
-            '404': { description: 'Listing not found' },
+            '404': {
+              description: 'Resource not found',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/Error' },
+                },
+              },
+            },
           },
         },
         put: {
@@ -513,7 +612,7 @@ const options: swaggerJsdoc.Options = {
           },
         },
       },
-      '/api/listings/{id}/boost': {
+      '/api/listing/{id}/toggle-boost': {
         put: {
           summary: 'Boost a listing',
           tags: ['Listings'],
@@ -535,7 +634,7 @@ const options: swaggerJsdoc.Options = {
                   properties: {
                     userId: {
                       type: 'string',
-                      description: 'The ID of the user boosting the post',
+                      description: 'The ID of the user boosting the listing',
                     },
                   },
                 },
@@ -547,7 +646,7 @@ const options: swaggerJsdoc.Options = {
           },
         },
       },
-      '/api/users/{id}': {
+      '/api/user/{id}': {
         get: {
           summary: 'Get user profile',
           tags: ['Users'],
