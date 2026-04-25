@@ -1,7 +1,7 @@
 import Listing from '../models/listingModel';
 import { Listing as ListingType } from '../types/listing';
 import aiService from './aiService';
-import userModel from '@/models/userModel';
+import userModel from '../models/userModel';
 
 type CreateListingPayload = Pick<
   ListingType,
