@@ -18,7 +18,7 @@ dotenv.config({ path: path.resolve(process.cwd(), envPath) });
 
 const app = express();
 
-const publicDir = path.join(__dirname, "../public");
+const publicDir = path.join(process.cwd(), "public");
 const uploadsDir = path.join(publicDir, "uploads");
 
 const initApp = (): Promise<Express> => {
@@ -36,6 +36,7 @@ const initApp = (): Promise<Express> => {
       );
       
       app.use("/public", express.static(uploadsDir));
+      app.use(express.static(publicDir));
 
       app.use(
         '/api-docs',
