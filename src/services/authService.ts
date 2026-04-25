@@ -40,7 +40,12 @@ const register = async (user: UserType) => {
     imageUrl,
   });
 
-  return newUser;
+  const tokens = generateTokens(newUser._id.toString());
+
+  newUser.refreshToken = [tokens.refreshToken];
+  const savedUser = await newUser.save();
+
+  return { ...tokens, user: savedUser };
 };
 
 const login = async (user: UserType) => {
