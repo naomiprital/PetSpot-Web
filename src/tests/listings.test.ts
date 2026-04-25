@@ -1,34 +1,153 @@
 import request from 'supertest';
-import express from 'express';
 import mongoose from 'mongoose';
-import listingRoutes from '../routes/listingRouter';
-
-const app = express();
-app.use(express.json());
-app.use('/api/listings', listingRoutes);
+import app from '../../index';
+import { getLogedInUser, testListing, MONGO_URI_TEST } from './utils';
 
 describe('Listing API Tests', () => {
-  // Before all tests, connect to a test database
   beforeAll(async () => {
-    const url =
-      process.env.MONGO_URI_TEST || 'mongodb://localhost:27017/petspot_test';
-    await mongoose.connect(url);
+    if (mongoose.connection.readyState === 0) {
+      await mongoose.connect(process.env.MONGODB_URI || MONGO_URI_TEST);
+    }
   });
 
-  // Clean up after tests
   afterAll(async () => {
+    if (mongoose.connection.db) {
+      await mongoose.connection.db.dropDatabase();
+    }
+
     await mongoose.connection.close();
   });
 
-  it('should fetch all listings', async () => {
-    const res = await request(app).get('/api/listings');
+  it('Should fetch all listings (empty array initially)', async () => {
+    const res = await request(app).get('/listing');
     expect(res.statusCode).toEqual(200);
     expect(Array.isArray(res.body)).toBeTruthy();
   });
 
-  it('should return 404 for a non-existent listing', async () => {
+  it('Should return 404 for a non-existent listing by id', async () => {
     const fakeId = new mongoose.Types.ObjectId().toString();
-    const res = await request(app).get(`/api/listings/${fakeId}`);
+    const res = await request(app).get(`/listing/${fakeId}`);
     expect(res.statusCode).toEqual(404);
+  });
+
+  it('Create listing without token should be forbidden', async () => {
+    const res = await request(app).post('/listing').send(testListing);
+    expect(res.statusCode).toBe(401);
+  });
+
+  it('Create listing with valid token succeeds', async () => {
+    const user = await getLogedInUser(app);
+    const res = await request(app)
+      .post('/listing')
+      .set('Cookie', [`accessToken=${user.token}`])
+      .send(testListing);
+    expect(res.statusCode).toBe(201);
+    expect(res.body).toHaveProperty('_id');
+    expect(res.body.author._id).toEqual(user._id);
+  });
+
+  it('Get listings by author id returns at least one listing', async () => {
+    const user = await getLogedInUser(app);
+    const createRes = await request(app)
+      .post('/listing')
+      .set('Cookie', [`accessToken=${user.token}`])
+      .send(testListing);
+    const authorId = user._id || createRes.body.author;
+    const res = await request(app).get(`/listing/user/${authorId}`);
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBeTruthy();
+    expect(res.body.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('Update listing without token is forbidden', async () => {
+    const user = await getLogedInUser(app);
+    const createRes = await request(app)
+      .post('/listing')
+      .set('Cookie', [`accessToken=${user.token}`])
+      .send(testListing);
+    const id = createRes.body._id;
+    const res = await request(app)
+      .put(`/listing/${id}`)
+      .send({ location: 'New Place' });
+    expect(res.status).toBe(401);
+  });
+
+  it('Update listing with token succeeds', async () => {
+    const user = await getLogedInUser(app);
+    const createRes = await request(app)
+      .post('/listing')
+      .set('Cookie', [`accessToken=${user.token}`])
+      .send(testListing);
+    const id = createRes.body._id;
+    const res = await request(app)
+      .put(`/listing/${id}`)
+      .set('Cookie', [`accessToken=${user.token}`])
+      .send({ location: 'Updated Location' });
+    expect(res.status).toBe(200);
+    expect(res.body.location).toBe('Updated Location');
+  });
+
+  it('Toggle boost on listing requires auth and toggles value', async () => {
+    const user = await getLogedInUser(app);
+    const createRes = await request(app)
+      .post('/listing')
+      .set('Cookie', [`accessToken=${user.token}`])
+      .send(testListing);
+    const id = createRes.body._id;
+
+    const onRes = await request(app)
+      .put(`/listing/${id}/toggle-boost`)
+      .set('Cookie', [`accessToken=${user.token}`]);
+    expect(onRes.status).toBe(200);
+    expect(
+      typeof onRes.body.boosts === 'number' || Array.isArray(onRes.body.boosts)
+    ).toBeTruthy();
+
+    const offRes = await request(app)
+      .put(`/listing/${id}/toggle-boost`)
+      .set('Cookie', [`accessToken=${user.token}`]);
+    expect(offRes.status).toBe(200);
+  });
+
+  it('Delete listing without token is forbidden', async () => {
+    const user = await getLogedInUser(app);
+    const createRes = await request(app)
+      .post('/listing')
+      .set('Cookie', [`accessToken=${user.token}`])
+      .send(testListing);
+    const id = createRes.body._id;
+    const res = await request(app).delete(`/listing/${id}`);
+    expect(res.status).toBe(401);
+  });
+
+  it('Delete listing with token succeeds', async () => {
+    const user = await getLogedInUser(app);
+    const createRes = await request(app)
+      .post('/listing')
+      .set('Cookie', [`accessToken=${user.token}`])
+      .send(testListing);
+    const id = createRes.body._id;
+    const res = await request(app)
+      .delete(`/listing/${id}`)
+      .set('Cookie', [`accessToken=${user.token}`]);
+    expect(res.status).toBe(200);
+  });
+
+  it('Operations on non-existing listing return 404', async () => {
+    const user = await getLogedInUser(app);
+    const fakeId = new mongoose.Types.ObjectId().toString();
+    const resGet = await request(app).get(`/listing/${fakeId}`);
+    expect(resGet.status).toBe(404);
+
+    const resUpdate = await request(app)
+      .put(`/listing/${fakeId}`)
+      .set('Cookie', [`accessToken=${user.token}`])
+      .send({ location: 'nowhere' });
+    expect(resUpdate.status).toBe(404);
+
+    const resDelete = await request(app)
+      .delete(`/listing/${fakeId}`)
+      .set('Cookie', [`accessToken=${user.token}`]);
+    expect(resDelete.status).toBe(404);
   });
 });

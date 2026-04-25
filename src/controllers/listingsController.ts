@@ -69,7 +69,13 @@ const updateListing = async (req: AuthRequest, res: Response) => {
     );
     res.json(updatedListing);
   } catch (error: any) {
-    res.status(400).json({ error: error.message });
+    if (error.message === 'Listing not found') {
+      res.status(404).json({ error: error.message });
+    } else if (error.message === 'Unauthorized') {
+      res.status(403).json({ error: error.message });
+    } else {
+      res.status(400).json({ error: error.message });
+    }
   }
 };
 
@@ -83,7 +89,13 @@ const deleteListing = async (req: AuthRequest, res: Response) => {
     );
     res.json(result);
   } catch (error: any) {
-    res.status(403).json({ error: error.message });
+    if (error.message === 'Listing not found') {
+      res.status(404).json({ error: error.message });
+    } else if (error.message === 'Unauthorized') {
+      res.status(403).json({ error: error.message });
+    } else {
+      res.status(400).json({ error: error.message });
+    }
   }
 };
 const toggleBoostListing = async (req: AuthRequest, res: Response) => {
@@ -95,7 +107,11 @@ const toggleBoostListing = async (req: AuthRequest, res: Response) => {
 
     res.status(200).json(updatedListing);
   } catch (error: any) {
-    res.status(400).json({ error: error.message });
+    if (error.message === 'Listing not found') {
+      res.status(404).json({ error: error.message });
+    } else {
+      res.status(400).json({ error: error.message });
+    }
   }
 };
 

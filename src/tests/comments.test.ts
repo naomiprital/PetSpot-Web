@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
-import { getLogedInUser, testListing, UserData } from './utils';
+import { getLogedInUser, testListing, UserData, MONGO_URI_TEST } from './utils';
 import app from '../../index';
 
 let loginUser: UserData;
@@ -12,7 +12,7 @@ const commentData = {
 
 beforeAll(async () => {
   if (mongoose.connection.readyState === 0) {
-    await mongoose.connect(process.env.DATABASE_URL as string);
+    await mongoose.connect(process.env.MONGODB_URI || MONGO_URI_TEST);
   }
   loginUser = await getLogedInUser(app);
 
@@ -65,7 +65,7 @@ describe('Comments API Tests', () => {
     if (!commentData._id) {
       const createResponse = await request(app)
         .post(`/comment/${listingId}`)
-        .set('Authorization', 'Bearer ' + loginUser.token)
+        .set('Cookie', [`accessToken=${loginUser.token}`])
         .send({
           authorId: loginUser._id,
           commentText: commentData.commentText,
@@ -88,7 +88,7 @@ describe('Comments API Tests', () => {
     if (!commentData._id) {
       const createResponse = await request(app)
         .post(`/comment/${listingId}`)
-        .set('Authorization', 'Bearer ' + loginUser.token)
+        .set('Cookie', [`accessToken=${loginUser.token}`])
         .send({
           authorId: loginUser._id,
           commentText: commentData.commentText,

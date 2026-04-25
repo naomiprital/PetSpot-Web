@@ -1,11 +1,11 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import { MONGO_URI_TEST } from './utils';
 dotenv.config({ path: '.env.test' });
 
 beforeAll(async () => {
   if (mongoose.connection.readyState === 0) {
-    const uri = process.env.MONGODB_URI || process.env.DATABASE_URL;
-    await mongoose.connect(uri as string);
+    await mongoose.connect(process.env.MONGODB_URI || MONGO_URI_TEST);
   }
 });
 

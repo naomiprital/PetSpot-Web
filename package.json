@@ -13,7 +13,7 @@
     "test": "jest --detectOpenHandles",
     "testAuth": "jest --runInBand --detectOpenHandles --forceExit ./src/tests/auth.test.ts",
     "testUsers": "jest --runInBand --detectOpenHandles --forceExit ./src/tests/user.test.ts",
-    "testListing": "jest --runInBand --detectOpenHandles --forceExit ./src/tests/listing.test.ts",
+    "testListing": "jest --runInBand --detectOpenHandles --forceExit ./src/tests/listings.test.ts",
     "testComments": "jest --runInBand --detectOpenHandles --forceExit ./src/tests/comments.test.ts",
     "testAi": "jest --runInBand --detectOpenHandles --forceExit ./src/tests/ai.test.ts"
   },

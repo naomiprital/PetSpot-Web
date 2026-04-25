@@ -2,6 +2,7 @@ import request from 'supertest';
 import app from '../../index';
 import mongoose from 'mongoose';
 import UserModel from '../models/userModel';
+import { MONGO_URI_TEST } from './utils';
 
 let userAToken = '';
 let userAId = '';
@@ -9,9 +10,7 @@ let userBId = '';
 
 beforeAll(async () => {
   if (mongoose.connection.readyState === 0) {
-    await mongoose.connect(
-      process.env.MONGODB_URI || (process.env.DATABASE_URL as string)
-    );
+    await mongoose.connect(process.env.MONGODB_URI || MONGO_URI_TEST);
   }
 });
 

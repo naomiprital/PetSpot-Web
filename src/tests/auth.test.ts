@@ -2,11 +2,11 @@ import request from 'supertest';
 import app from '../../index';
 import mongoose from 'mongoose';
 import User from '../models/userModel';
-import { testListing, userData } from './utils';
+import { testListing, userData, MONGO_URI_TEST } from './utils';
 
 beforeAll(async () => {
   if (mongoose.connection.readyState === 0) {
-    await mongoose.connect(process.env.DATABASE_URL as string);
+    await mongoose.connect(process.env.MONGODB_URI || MONGO_URI_TEST);
   }
   await User.deleteMany({});
 });

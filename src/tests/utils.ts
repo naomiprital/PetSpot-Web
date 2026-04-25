@@ -1,5 +1,7 @@
-import request from 'supertest';
 import { Express } from 'express';
+import request from 'supertest';
+
+export const MONGO_URI_TEST = 'mongodb://localhost:27017/petspot-test';
 
 // Ensure aiService is mocked during tests to avoid external API calls/log noise
 jest.mock('../../src/services/aiService', () => ({
