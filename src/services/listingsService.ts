@@ -1,6 +1,7 @@
 import Listing from '../models/listingModel';
 import { Listing as ListingType } from '../types/listing';
 import aiService from './aiService';
+import userModel from '../models/userModel';
 
 type CreateListingPayload = Pick<
   ListingType,
@@ -113,9 +114,14 @@ const deleteListing = async (id: string, authorId: string) => {
 
 const toggleBoost = async (listingId: string, userId: string) => {
   const listing = await Listing.findById(listingId);
+  const user = await userModel.findById(userId);
 
   if (!listing || listing.isDeleted) {
     throw new Error('Listing not found');
+  }
+
+  if(!user) {
+    throw new Error('User not found');
   }
 
   const hasBoosted = listing.boosts.some(id => id.toString() === userId);
