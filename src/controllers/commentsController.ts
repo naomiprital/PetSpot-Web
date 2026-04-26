@@ -24,7 +24,14 @@ const createComment = async (req: AuthRequest, res: Response) => {
     );
     res.status(201).json(newComment);
   } catch (error: any) {
-    res.status(400).json({ error: error.message });
+    if (
+      error.message === 'Listing not found' ||
+      error.message === 'Listing is deleted'
+    ) {
+      res.status(404).json({ error: error.message });
+    } else {
+      res.status(400).json({ error: error.message });
+    }
   }
 };
 
@@ -39,7 +46,11 @@ const updateComment = async (req: AuthRequest, res: Response) => {
     );
     res.json(updatedComment);
   } catch (error: any) {
-    res.status(403).json({ error: error.message });
+    if (error.message === 'Comment not found') {
+      res.status(404).json({ error: error.message });
+    } else {
+      res.status(400).json({ error: error.message });
+    }
   }
 };
 
