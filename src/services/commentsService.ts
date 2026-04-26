@@ -29,13 +29,6 @@ const createComment = async (
   );
 };
 
-const getCommentById = async (id: string) => {
-  return await Comment.findById(id).populate(
-    'author',
-    'firstName lastName email imageUrl phoneNumber'
-  );
-};
-
 const getCommentsByListingId = async (listingId: string) => {
   return await Comment.find({ listingId })
     .sort({ createdAt: -1 })
@@ -78,7 +71,6 @@ const deleteComment = async (id: string, authorId: string) => {
 export default {
   getComments,
   createComment,
-  getCommentById,
   getCommentsByListingId,
   updateComment,
   deleteComment,

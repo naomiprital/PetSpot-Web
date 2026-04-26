@@ -56,4 +56,9 @@ const deleteComment = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export default { getComments, createComment, updateComment, deleteComment };
+export default {
+  getComments,
+  createComment,
+  updateComment,
+  deleteComment,
+};

@@ -1,28 +1,32 @@
+import { describe, test, expect, beforeAll, afterAll } from '@jest/globals';
 import mongoose from 'mongoose';
 import request from 'supertest';
-import { getLogedInUser, UserData } from './utils';
-// import app from '../index';
+import { getLogedInUser, MONGO_URI_TEST, testListing, UserData } from './utils';
 import { Express } from 'express';
 import initApp from '..';
 
 let loginUser: UserData;
 let app: Express;
+let listingId: string;
 
 const commentData = {
   _id: undefined,
   commentText: 'Test comment',
-  postId: '697e36b697787eb1b24bc3cc',
-  sender: '',
 };
 
 beforeAll(async () => {
   app = await initApp();
 
   if (mongoose.connection.readyState === 0) {
-    await mongoose.connect(process.env.DATABASE_URL as string);
+    await mongoose.connect(process.env.MONGODB_URI || MONGO_URI_TEST);
   }
+  
   loginUser = await getLogedInUser(app);
-  commentData.sender = loginUser._id;
+  const listingResponse = await request(app)
+    .post('/api/listing')
+    .set('Cookie', [`accessToken=${loginUser.token}`])
+    .send({ authorId: loginUser._id, ...testListing });
+  listingId = listingResponse.body._id;
 });
 
 afterAll(async () => {
@@ -30,73 +34,58 @@ afterAll(async () => {
 });
 
 describe('Comments API Tests', () => {
-  test('Get Comments - should retrieve all comments', async () => {
-    const response = await request(app).get('/comment');
+  test('Get Comments - should retrieve all comments for a listing', async () => {
+    const response = await request(app).get(`/api/comment/${listingId}`);
     expect(response.statusCode).toBe(200);
     expect(Array.isArray(response.body)).toBe(true);
   });
 
   test('Create Comment - should create a new comment with valid token', async () => {
     const response = await request(app)
-      .post('/comment')
-      .set('Authorization', 'Bearer ' + loginUser.token)
-      .send(commentData);
+      .post(`/api/comment/${listingId}`)
+      .set('Cookie', [`accessToken=${loginUser.token}`])
+      .send({
+        authorId: loginUser._id,
+        commentText: commentData.commentText,
+      });
     commentData._id = response.body._id;
 
     expect(response.statusCode).toBe(201);
     expect(response.body).toHaveProperty('_id');
     expect(response.body.commentText).toBe(commentData.commentText);
-    expect(response.body.sender).toBe(loginUser._id);
   });
 
   test('Create Comment - should be denied with invalid token', async () => {
     const response = await request(app)
-      .post('/comment')
-      .set('Authorization', 'Bearer ' + loginUser.token + 'junk')
-      .send(commentData);
+      .post(`/api/comment/${listingId}`)
+      .set('Cookie', [`accessToken=${loginUser.token}junk`])
+      .send({
+        authorId: loginUser._id,
+        commentText: commentData.commentText,
+      });
     expect(response.statusCode).toBe(401);
-  });
-
-  test('Get Comment by ID - should retrieve a specific comment', async () => {
-    if (!commentData._id) {
-      const createResponse = await request(app)
-        .post('/comment')
-        .set('Authorization', 'Bearer ' + loginUser.token)
-        .send(commentData);
-      commentData._id = createResponse.body._id;
-    }
-
-    const response = await request(app)
-      .get('/comment/' + commentData._id)
-      .set('Authorization', 'Bearer ' + loginUser.token);
-    expect(response.statusCode).toBe(200);
-    expect(response.body._id).toBe(commentData._id);
-    expect(response.body.commentText).toBe(commentData.commentText);
-    expect(response.body.sender).toBe(commentData.sender);
-  });
-
-  test('Get Comments by Post ID - should retrieve comments for a specific post', async () => {
-    const response = await request(app)
-      .get('/comment?postId=' + commentData.postId)
-      .set('Authorization', 'Bearer ' + loginUser.token);
-    expect(response.statusCode).toBe(200);
-    expect(Array.isArray(response.body)).toBe(true);
   });
 
   test('Update Comment - should update a comment with valid token', async () => {
     const updatedText = 'Updated test comment';
     if (!commentData._id) {
       const createResponse = await request(app)
-        .post('/comment')
-        .set('Authorization', 'Bearer ' + loginUser.token)
-        .send(commentData);
+        .post(`/api/comment/${listingId}`)
+        .set('Cookie', [`accessToken=${loginUser.token}`])
+        .send({
+          authorId: loginUser._id,
+          commentText: commentData.commentText,
+        });
       commentData._id = createResponse.body._id;
     }
 
     const response = await request(app)
-      .put('/comment/' + commentData._id)
-      .set('Authorization', 'Bearer ' + loginUser.token)
-      .send({ commentText: updatedText });
+      .put(`/api/comment/${commentData._id}`)
+      .set('Cookie', [`accessToken=${loginUser.token}`])
+      .send({
+        authorId: loginUser._id,
+        commentText: updatedText,
+      });
     expect(response.statusCode).toBe(200);
     expect(response.body.commentText).toBe(updatedText);
   });
@@ -104,16 +93,19 @@ describe('Comments API Tests', () => {
   test('Delete Comment - should delete a comment with valid token', async () => {
     if (!commentData._id) {
       const createResponse = await request(app)
-        .post('/comment')
-        .set('Authorization', 'Bearer ' + loginUser.token)
-        .send(commentData);
+        .post(`/api/comment/${listingId}`)
+        .set('Cookie', [`accessToken=${loginUser.token}`])
+        .send({
+          authorId: loginUser._id,
+          commentText: commentData.commentText,
+        });
       commentData._id = createResponse.body._id;
     }
 
     const response = await request(app)
-      .delete('/comment/' + commentData._id)
-      .set('Authorization', 'Bearer ' + loginUser.token);
+      .delete(`/api/comment/${commentData._id}`)
+      .set('Cookie', [`accessToken=${loginUser.token}`])
+      .send({ listingId: listingId });
     expect(response.statusCode).toBe(200);
-    expect(response.body.message).toBe('Comment deleted successfully');
   });
 });

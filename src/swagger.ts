@@ -23,10 +23,10 @@ const options: swaggerJsdoc.Options = {
     ],
     components: {
       securitySchemes: {
-        bearerAuth: {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
+        cookieAuth: {
+          type: 'apiKey',
+          in: 'cookie',
+          name: 'accessToken',
         },
       },
       schemas: {
@@ -55,6 +55,83 @@ const options: swaggerJsdoc.Options = {
               example: 'A small white terrier with brown patches.',
             },
             animalType: { type: 'string', example: 'dog' },
+          },
+        },
+        User: {
+          type: 'object',
+          properties: {
+            _id: { type: 'string' },
+            email: { type: 'string' },
+            firstName: { type: 'string' },
+            lastName: { type: 'string' },
+            phoneNumber: { type: 'string' },
+            imageUrl: { type: 'string' },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        Listing: {
+          type: 'object',
+          properties: {
+            _id: { type: 'string' },
+            listingType: { type: 'string', enum: LISTING_TYPES },
+            animalType: { type: 'string', enum: ANIMAL_TYPES },
+            imageUrl: { type: 'string' },
+            location: { type: 'string' },
+            lastSeen: { type: 'number' },
+            description: { type: 'string' },
+            comments: {
+              type: 'array',
+              items: { type: 'string', description: 'Comment ID' },
+            },
+            boosts: {
+              type: 'array',
+              items: { type: 'string', description: 'User ID' },
+            },
+            author: {
+              oneOf: [
+                { type: 'string', description: 'User ID' },
+                { $ref: '#/components/schemas/User' },
+              ],
+            },
+            aiVisualTags: { type: 'string' },
+            isResolved: { type: 'boolean' },
+            isDeleted: { type: 'boolean' },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        Comment: {
+          type: 'object',
+          properties: {
+            _id: { type: 'string' },
+            listingId: { type: 'string' },
+            commentText: { type: 'string' },
+            author: {
+              oneOf: [
+                { type: 'string', description: 'User ID' },
+                { $ref: '#/components/schemas/User' },
+              ],
+            },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        LoginRequest: {
+          type: 'object',
+          required: ['email', 'password'],
+          properties: {
+            email: { type: 'string' },
+            password: { type: 'string' },
+          },
+        },
+        AuthResponse: {
+          $ref: '#/components/schemas/User',
+        },
+        RefreshTokenRequest: {
+          type: 'object',
+          properties: {
+            refreshToken: { type: 'string' },
           },
         },
       },
@@ -222,7 +299,7 @@ const options: swaggerJsdoc.Options = {
           },
         },
       },
-      '/api/comments/{listingId}': {
+      '/api/comment/{listingId}': {
         get: {
           summary: 'Get all comments for a specific listing',
           tags: ['Comments'],
@@ -286,7 +363,7 @@ const options: swaggerJsdoc.Options = {
           },
         },
       },
-      '/api/comments/{id}': {
+      '/api/comment/{id}': {
         put: {
           summary: 'Update a specific comment',
           tags: ['Comments'],
@@ -360,7 +437,7 @@ const options: swaggerJsdoc.Options = {
           },
         },
       },
-      '/api/listings': {
+      '/api/listing': {
         get: {
           summary: 'Get all active pet listings',
           tags: ['Listings'],
@@ -411,7 +488,7 @@ const options: swaggerJsdoc.Options = {
           },
         },
       },
-      '/api/listings/user/{authorId}': {
+      '/api/listing/user/{authorId}': {
         get: {
           summary: 'Get all listings created by a specific user',
           tags: ['Listings'],
@@ -439,7 +516,7 @@ const options: swaggerJsdoc.Options = {
           },
         },
       },
-      '/api/listings/{id}': {
+      '/api/listing/{id}': {
         get: {
           summary: 'Get a specific listing by ID',
           tags: ['Listings'],
@@ -513,9 +590,9 @@ const options: swaggerJsdoc.Options = {
           },
         },
       },
-      '/api/listings/{id}/boost': {
+      '/api/listing/{id}/toggle-boost': {
         put: {
-          summary: 'Boost a listing',
+          summary: 'Toggle boost on a listing',
           tags: ['Listings'],
           parameters: [
             {
@@ -525,29 +602,12 @@ const options: swaggerJsdoc.Options = {
               schema: { type: 'string' },
             },
           ],
-          requestBody: {
-            required: true,
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                  required: ['userId'],
-                  properties: {
-                    userId: {
-                      type: 'string',
-                      description: 'The ID of the user boosting the post',
-                    },
-                  },
-                },
-              },
-            },
-          },
           responses: {
-            '200': { description: 'Listing boosted successfully' },
+            '200': { description: 'Boost toggled successfully' },
           },
         },
       },
-      '/api/users/{id}': {
+      '/api/user/{id}': {
         get: {
           summary: 'Get user profile',
           tags: ['Users'],

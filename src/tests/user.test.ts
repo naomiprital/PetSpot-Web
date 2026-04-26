@@ -1,17 +1,20 @@
+import { describe, test, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
 import request from 'supertest';
-import app from '../index';
+import { Express } from 'express';
+import initApp from '../index';
 import mongoose from 'mongoose';
 import UserModel from '../models/userModel';
+import { MONGO_URI_TEST } from './utils';
 
+let app: Express;
 let userAToken = '';
 let userAId = '';
 let userBId = '';
 
 beforeAll(async () => {
+  app = await initApp();
   if (mongoose.connection.readyState === 0) {
-    await mongoose.connect(
-      process.env.MONGODB_URI || (process.env.DATABASE_URL as string)
-    );
+    await mongoose.connect(process.env.MONGODB_URI || MONGO_URI_TEST);
   }
 });
 
@@ -23,7 +26,7 @@ describe('User API & Security', () => {
   beforeEach(async () => {
     await UserModel.deleteMany({});
 
-    const resA = await request(app).post('/auth/register').send({
+    const resA = await request(app).post('/api/auth/register').send({
       email: 'victim@test.com',
       password: 'password123',
       firstName: 'Victim',
@@ -33,7 +36,7 @@ describe('User API & Security', () => {
     });
     userAId = resA.body._id;
 
-    const resB = await request(app).post('/auth/register').send({
+    const resB = await request(app).post('/api/auth/register').send({
       email: 'hacker@test.com',
       password: 'password123',
       firstName: 'Hacker',
@@ -42,16 +45,22 @@ describe('User API & Security', () => {
     });
     userBId = resB.body._id;
 
-    const loginA = await request(app).post('/auth/login').send({
+    const loginA = await request(app).post('/api/auth/login').send({
       email: 'victim@test.com',
       password: 'password123',
     });
-
-    userAToken = loginA.body.accessToken;
+    const setCookiesA = loginA.headers['set-cookie'];
+    const cookiesA = Array.isArray(setCookiesA)
+      ? setCookiesA
+      : setCookiesA
+        ? [setCookiesA]
+        : [];
+    const accessA = cookiesA.find((c: string) => c.startsWith('accessToken='));
+    userAToken = accessA ? accessA.split(';')[0].split('=')[1] : '';
   });
 
-  test('GET /user/:id - should return user profile', async () => {
-    const response = await request(app).get(`/user/${userAId}`);
+  test('GET /api/user/:id - should return user profile', async () => {
+    const response = await request(app).get(`/api/user/${userAId}`);
 
     expect(response.statusCode).toBe(200);
     expect(response.body.firstName).toBe('Victim');
@@ -60,10 +69,10 @@ describe('User API & Security', () => {
     expect(response.body.password).toBeUndefined();
   });
 
-  test('PUT /user/:id - should allow user to update their OWN profile', async () => {
+  test('PUT /api/user/:id - should allow user to update their OWN profile', async () => {
     const response = await request(app)
-      .put(`/user/${userAId}`)
-      .set('Authorization', 'Bearer ' + userAToken)
+      .put(`/api/user/${userAId}`)
+      .set('Cookie', [`accessToken=${userAToken}`])
       .send({
         firstName: 'Updated',
         lastName: 'Name',
@@ -76,16 +85,23 @@ describe('User API & Security', () => {
     expect(response.body.phoneNumber).toBe('9876543210');
   });
 
-  test('PUT /user/:id - should BLOCK a hacker from updating someone else', async () => {
-    const loginB = await request(app).post('/auth/login').send({
+  test('PUT /api/user/:id - should BLOCK a hacker from updating someone else', async () => {
+    const loginB = await request(app).post('/api/auth/login').send({
       email: 'hacker@test.com',
       password: 'password123',
     });
-    const hackerToken = loginB.body.accessToken;
+    const setCookiesB = loginB.headers['set-cookie'];
+    const cookiesB = Array.isArray(setCookiesB)
+      ? setCookiesB
+      : setCookiesB
+        ? [setCookiesB]
+        : [];
+    const accessB = cookiesB.find((c: string) => c.startsWith('accessToken='));
+    const hackerToken = accessB ? accessB.split(';')[0].split('=')[1] : '';
 
     const response = await request(app)
-      .put(`/user/${userAId}`)
-      .set('Authorization', 'Bearer ' + hackerToken)
+      .put(`/api/user/${userAId}`)
+      .set('Cookie', [`accessToken=${hackerToken}`])
       .send({
         firstName: 'Hacked',
         lastName: 'Hacker',

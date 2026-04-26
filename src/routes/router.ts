@@ -1,5 +1,4 @@
 import express from 'express';
-// import postsRouter from './postsRouter';
 import commentsRouter from './commentsRouter';
 import authRouter from './authRouter';
 import userRouter from './userRouter';
@@ -7,8 +6,6 @@ import aiRouter from './aiRouter';
 import listingRouter from './listingRouter';
 
 const router = express.Router();
-
-// router.use('/post', postsRouter);
 
 router.use('/listing', listingRouter);
 
