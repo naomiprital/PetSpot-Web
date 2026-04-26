@@ -475,6 +475,7 @@ const options: swaggerJsdoc.Options = {
         },
         post: {
           summary: 'Create a new pet listing',
+          security: [{ cookieAuth: [] }],
           tags: ['Listings'],
           requestBody: {
             required: true,
@@ -507,8 +508,9 @@ const options: swaggerJsdoc.Options = {
                 },
               },
             },
-            '401': { description: 'Unauthorized' },
             '400': { description: 'Bad request' },
+            '401': { description: 'Unauthorized' },
+            '500': { description: 'Internal server error' },
           },
         },
       },
