@@ -49,7 +49,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTdlMTFhM
     "phoneNumber": "9876543210"
 }
 
-### 6. Create a Post
+### 6. Create a Listing
 POST http://localhost:8080/listing
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTdkZmRkM2QxYzRiOGFmNzM0ZTEwNWIiLCJpYXQiOjE3Njk4NjQ3OTQsImV4cCI6MTc2OTg2ODM5NH0.uYmE3FQpuLelBEmgAHRBnx6zWzCb0sh0FJrnKDAFw_U
@@ -63,10 +63,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTdkZmRkM
     "description": "Cute puppy found near the park"
 }
 
-### 6.5. Get all posts (To find the ID)
+### 6.5. Get all listings (To find the ID)
 GET http://localhost:8080/listing
 
-### 7. Update your Post
+### 7. Update your Listing
 PUT http://localhost:8080/listing/697dfe79d1c4b8af734e106a
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTdkZmRkM2QxYzRiOGFmNzM0ZTEwNWIiLCJpYXQiOjE3Njk4NjQ3OTQsImV4cCI6MTc2OTg2ODM5NH0.uYmE3FQpuLelBEmgAHRBnx6zWzCb0sh0FJrnKDAFw_U
@@ -96,8 +96,8 @@ Content-Type: application/json
     "password": "123"
 }
 
-### 10. BadGuy tries to DELETE GoodGuy's Post/Comment
-PUT http://localhost:8080/post/697dfe79d1c4b8af734e106a
+### 10. BadGuy tries to DELETE GoodGuy's Listing/Comment
+PUT http://localhost:8080/listing/697dfe79d1c4b8af734e106a
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTdkZmUyOWQxYzRiOGFmNzM0ZTEwNjIiLCJpYXQiOjE3Njk4NjQ4ODUsImV4cCI6MTc2OTg2ODQ4NX0.hGJOxHUKOfosoQwXLWh2rNgdbmUR5UDTxQ6pdLtWFaQ
 

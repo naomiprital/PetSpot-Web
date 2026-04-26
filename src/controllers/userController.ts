@@ -14,10 +14,13 @@ const getUser = async (req: Request, res: Response) => {
 
 const updateUser = async (req: AuthRequest, res: Response) => {
   try {
-    if (req.params.id !== req.user?._id) {
+    const userId = req.params.id;
+    const requestingUserId = req.user?._id;
+
+    if (userId !== requestingUserId) {
       return res
         .status(403)
-        .json({ error: 'Forbidden: You can only edit your own profile' });
+        .json({ error: 'You can only update your own profile' });
     }
 
     const updateData = { ...req.body };
@@ -27,7 +30,7 @@ const updateUser = async (req: AuthRequest, res: Response) => {
     }
 
     const updatedUser = await userService.updateUser(
-      req.params.id as string,
+      userId as string,
       updateData
     );
     res.json(updatedUser);
