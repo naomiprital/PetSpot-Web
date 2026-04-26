@@ -11,6 +11,16 @@ const createComment = async (
   authorId: string,
   commentText: string
 ) => {
+  const listing = await listingModel.findById(listingId);
+
+  if (!listing) {
+    throw new Error('Listing not found');
+  }
+
+  if (listing.isDeleted) {
+    throw new Error('Listing is deleted');
+  }
+
   const newComment = await Comment.create({
     listingId,
     commentText,

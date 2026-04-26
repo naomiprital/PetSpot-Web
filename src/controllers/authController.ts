@@ -132,12 +132,15 @@ const googleLogin = async (req: Request, res: Response) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 const logout = async (req: Request, res: Response) => {
   try {
     const refreshToken = req.cookies?.refreshToken;
 
     if (refreshToken) {
       await authService.logout(refreshToken);
+    } else {
+      throw new Error('No refresh token found in cookies');
     }
 
     res.clearCookie('accessToken');

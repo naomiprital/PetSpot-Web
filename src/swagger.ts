@@ -70,35 +70,21 @@ const options: swaggerJsdoc.Options = {
             updatedAt: { type: 'string', format: 'date-time' },
           },
         },
-        Listing: {
+        LoginRequest: {
+          type: 'object',
+          required: ['email', 'password'],
+          properties: {
+            email: { type: 'string', format: 'email' },
+            password: { type: 'string', format: 'password' },
+          },
+        },
+        AuthResponse: {
           type: 'object',
           properties: {
             _id: { type: 'string' },
-            listingType: { type: 'string', enum: LISTING_TYPES },
-            animalType: { type: 'string', enum: ANIMAL_TYPES },
-            imageUrl: { type: 'string' },
-            location: { type: 'string' },
-            lastSeen: { type: 'number' },
-            description: { type: 'string' },
-            comments: {
-              type: 'array',
-              items: { type: 'string', description: 'Comment ID' },
-            },
-            boosts: {
-              type: 'array',
-              items: { type: 'string', description: 'User ID' },
-            },
-            author: {
-              oneOf: [
-                { type: 'string', description: 'User ID' },
-                { $ref: '#/components/schemas/User' },
-              ],
-            },
-            aiVisualTags: { type: 'string' },
-            isResolved: { type: 'boolean' },
-            isDeleted: { type: 'boolean' },
-            createdAt: { type: 'string', format: 'date-time' },
-            updatedAt: { type: 'string', format: 'date-time' },
+            email: { type: 'string' },
+            accessToken: { type: 'string' },
+            refreshToken: { type: 'string' },
           },
         },
         Comment: {
@@ -107,31 +93,44 @@ const options: swaggerJsdoc.Options = {
             _id: { type: 'string' },
             listingId: { type: 'string' },
             commentText: { type: 'string' },
-            author: {
-              oneOf: [
-                { type: 'string', description: 'User ID' },
-                { $ref: '#/components/schemas/User' },
-              ],
-            },
+            author: { $ref: '#/components/schemas/User' },
             createdAt: { type: 'string', format: 'date-time' },
             updatedAt: { type: 'string', format: 'date-time' },
           },
         },
-        LoginRequest: {
+        Listing: {
           type: 'object',
-          required: ['email', 'password'],
           properties: {
-            email: { type: 'string' },
-            password: { type: 'string' },
+            _id: { type: 'string' },
+            listingType: { type: 'string', enum: LISTING_TYPES },
+            animalType: { type: 'string', enum: ANIMAL_TYPES },
+            imageUrl: { type: 'string' },
+            location: { type: 'string' },
+            lastSeen: {
+              type: 'number',
+              description: 'Unix timestamp of when the pet was last seen',
+            },
+            description: { type: 'string' },
+            author: { $ref: '#/components/schemas/User' },
+            comments: {
+              type: 'array',
+              items: { $ref: '#/components/schemas/Comment' },
+            },
+            boosts: {
+              type: 'array',
+              items: { type: 'string' },
+            },
+            aiVisualTags: { type: 'string' },
+            isResolved: { type: Boolean },
+            isDeleted: { type: 'boolean' },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
           },
         },
-        AuthResponse: {
-          $ref: '#/components/schemas/User',
-        },
-        RefreshTokenRequest: {
+        Error: {
           type: 'object',
           properties: {
-            refreshToken: { type: 'string' },
+            error: { type: 'string' },
           },
         },
       },
@@ -151,6 +150,8 @@ const options: swaggerJsdoc.Options = {
           },
           responses: {
             '200': { description: 'Ranked search results' },
+            '401': { description: 'Unauthorized' },
+            '400': { description: 'Bad request' },
           },
         },
       },
@@ -180,6 +181,8 @@ const options: swaggerJsdoc.Options = {
                 },
               },
             },
+            '401': { description: 'Unauthorized' },
+            '400': { description: 'Bad request' },
           },
         },
       },
@@ -214,6 +217,8 @@ const options: swaggerJsdoc.Options = {
                 },
               },
             },
+            '401': { description: 'Unauthorized' },
+            '400': { description: 'Bad request' },
           },
         },
       },
@@ -238,6 +243,8 @@ const options: swaggerJsdoc.Options = {
                 },
               },
             },
+            '401': { description: 'Unauthorized' },
+            '400': { description: 'Bad request' },
           },
         },
       },
@@ -245,16 +252,24 @@ const options: swaggerJsdoc.Options = {
         post: {
           summary: 'Refresh access token',
           tags: ['Auth'],
-          requestBody: {
-            required: true,
-            content: {
-              'application/json': {
-                schema: { $ref: '#/components/schemas/RefreshTokenRequest' },
+          responses: {
+            '200': {
+              description: 'Access token refreshed successfully',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/AuthResponse' },
+                },
               },
             },
-          },
-          responses: {
-            '200': { description: 'Tokens refreshed' },
+            '400': {
+              description: 'Bad request',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/Error' },
+                },
+              },
+            },
+            '401': { description: 'Unauthorized' },
           },
         },
       },
@@ -264,6 +279,9 @@ const options: swaggerJsdoc.Options = {
           tags: ['Auth'],
           responses: {
             '200': { description: 'Logged out successfully' },
+            '401': { description: 'Unauthorized' },
+            '400': { description: 'Bad request' },
+            '500': { description: 'Internal server error' },
           },
         },
       },
@@ -278,9 +296,19 @@ const options: swaggerJsdoc.Options = {
                 schema: {
                   type: 'object',
                   properties: {
-                    credential: {
+                    credentials: {
+                      type: 'object',
+                      properties: {
+                        credential: {
+                          type: 'string',
+                          description: 'Google JWT credential or access token',
+                        },
+                      },
+                    },
+                    phoneNumber: {
                       type: 'string',
-                      description: 'Google JWT credential or access token',
+                      description: "The user's phone number",
+                      example: '0501234567',
                     },
                   },
                 },
@@ -296,6 +324,8 @@ const options: swaggerJsdoc.Options = {
                 },
               },
             },
+            '401': { description: 'Unauthorized' },
+            '400': { description: 'Bad request' },
           },
         },
       },
@@ -323,10 +353,14 @@ const options: swaggerJsdoc.Options = {
                 },
               },
             },
+            '401': { description: 'Unauthorized' },
+            '404': { description: 'Listing not found' },
+            '400': { description: 'Bad request' },
           },
         },
         post: {
           summary: 'Add a comment to a listing',
+          security: [{ cookieAuth: [] }],
           tags: ['Comments'],
           parameters: [
             {
@@ -342,9 +376,8 @@ const options: swaggerJsdoc.Options = {
               'application/json': {
                 schema: {
                   type: 'object',
-                  required: ['authorId', 'commentText'],
+                  required: ['commentText'],
                   properties: {
-                    authorId: { type: 'string' },
                     commentText: { type: 'string' },
                   },
                 },
@@ -360,11 +393,15 @@ const options: swaggerJsdoc.Options = {
                 },
               },
             },
+            '401': { description: 'Unauthorized' },
+            '404': { description: 'Listing not found' },
+            '400': { description: 'Bad request' },
           },
         },
       },
       '/api/comment/{id}': {
         put: {
+          security: [{ cookieAuth: [] }],
           summary: 'Update a specific comment',
           tags: ['Comments'],
           parameters: [
@@ -382,12 +419,8 @@ const options: swaggerJsdoc.Options = {
               'application/json': {
                 schema: {
                   type: 'object',
-                  required: ['authorId', 'commentText'],
+                  required: ['commentText'],
                   properties: {
-                    authorId: {
-                      type: 'string',
-                      description: 'Used to verify ownership',
-                    },
                     commentText: { type: 'string' },
                   },
                 },
@@ -396,9 +429,13 @@ const options: swaggerJsdoc.Options = {
           },
           responses: {
             '200': { description: 'Comment updated successfully' },
+            '401': { description: 'Unauthorized' },
+            '404': { description: 'Comment not found' },
+            '400': { description: 'Bad request' },
           },
         },
         delete: {
+          security: [{ cookieAuth: [] }],
           summary: 'Delete a specific comment',
           tags: ['Comments'],
           parameters: [
@@ -410,30 +447,11 @@ const options: swaggerJsdoc.Options = {
               schema: { type: 'string' },
             },
           ],
-          requestBody: {
-            required: true,
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                  required: ['authorId', 'listingId'],
-                  properties: {
-                    authorId: {
-                      type: 'string',
-                      description: 'Used to verify ownership',
-                    },
-                    listingId: {
-                      type: 'string',
-                      description:
-                        'The ID of the listing the comment belongs to',
-                    },
-                  },
-                },
-              },
-            },
-          },
           responses: {
             '200': { description: 'Comment deleted successfully' },
+            '401': { description: 'Unauthorized' },
+            '404': { description: 'Comment not found' },
+            '400': { description: 'Bad request' },
           },
         },
       },
@@ -465,10 +483,14 @@ const options: swaggerJsdoc.Options = {
                 schema: {
                   type: 'object',
                   properties: {
-                    authorId: { type: 'string' },
                     listingType: { type: 'string', enum: LISTING_TYPES },
                     animalType: { type: 'string', enum: ANIMAL_TYPES },
                     location: { type: 'string' },
+                    lastSeen: {
+                      type: 'number',
+                      description:
+                        'Unix timestamp of when the pet was last seen',
+                    },
                     description: { type: 'string' },
                     image: { type: 'string', format: 'binary' },
                   },
@@ -485,6 +507,8 @@ const options: swaggerJsdoc.Options = {
                 },
               },
             },
+            '401': { description: 'Unauthorized' },
+            '400': { description: 'Bad request' },
           },
         },
       },
@@ -513,6 +537,9 @@ const options: swaggerJsdoc.Options = {
                 },
               },
             },
+            '404': { description: 'Listing not found' },
+            '401': { description: 'Unauthorized' },
+            '400': { description: 'Bad request' },
           },
         },
       },
@@ -530,12 +557,20 @@ const options: swaggerJsdoc.Options = {
           ],
           responses: {
             '200': { description: 'The listing data' },
-            '404': { description: 'Listing not found' },
+            '404': {
+              description: 'Resource not found',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/Error' },
+                },
+              },
+            },
           },
         },
         put: {
           summary: 'Update an existing listing',
           tags: ['Listings'],
+          security: [{ cookieAuth: [] }],
           parameters: [
             {
               in: 'path',
@@ -550,7 +585,10 @@ const options: swaggerJsdoc.Options = {
                 schema: {
                   type: 'object',
                   properties: {
-                    authorId: { type: 'string' },
+                    listingType: { type: 'string', enum: LISTING_TYPES },
+                    animalType: { type: 'string', enum: ANIMAL_TYPES },
+                    location: { type: 'string' },
+                    lastSeen: { type: 'number' },
                     description: { type: 'string' },
                     image: { type: 'string', format: 'binary' },
                   },
@@ -560,11 +598,15 @@ const options: swaggerJsdoc.Options = {
           },
           responses: {
             '200': { description: 'Updated successfully' },
+            '401': { description: 'Unauthorized' },
+            '404': { description: 'Listing not found' },
+            '400': { description: 'Bad request' },
           },
         },
         delete: {
           summary: 'Soft delete a listing',
           tags: ['Listings'],
+          security: [{ cookieAuth: [] }],
           parameters: [
             {
               in: 'path',
@@ -573,20 +615,11 @@ const options: swaggerJsdoc.Options = {
               schema: { type: 'string' },
             },
           ],
-          requestBody: {
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                  properties: {
-                    authorId: { type: 'string' },
-                  },
-                },
-              },
-            },
-          },
           responses: {
             '200': { description: 'Deleted successfully' },
+            '401': { description: 'Unauthorized' },
+            '404': { description: 'Listing not found' },
+            '400': { description: 'Bad request' },
           },
         },
       },
@@ -594,6 +627,7 @@ const options: swaggerJsdoc.Options = {
         put: {
           summary: 'Toggle boost on a listing',
           tags: ['Listings'],
+          security: [{ cookieAuth: [] }],
           parameters: [
             {
               in: 'path',
@@ -603,7 +637,10 @@ const options: swaggerJsdoc.Options = {
             },
           ],
           responses: {
-            '200': { description: 'Boost toggled successfully' },
+            '200': { description: 'Listing boosted successfully' },
+            '401': { description: 'Unauthorized' },
+            '404': { description: 'Listing not found' },
+            '400': { description: 'Bad request' },
           },
         },
       },
@@ -621,11 +658,15 @@ const options: swaggerJsdoc.Options = {
           ],
           responses: {
             '200': { description: 'User profile data' },
+            '401': { description: 'Unauthorized' },
+            '404': { description: 'User not found' },
+            '400': { description: 'Bad request' },
           },
         },
         put: {
           summary: 'Update user profile',
           tags: ['Users'],
+          security: [{ cookieAuth: [] }],
           parameters: [
             {
               in: 'path',
@@ -650,6 +691,9 @@ const options: swaggerJsdoc.Options = {
           },
           responses: {
             '200': { description: 'Profile updated' },
+            '401': { description: 'Unauthorized' },
+            '404': { description: 'User not found' },
+            '400': { description: 'Bad request' },
           },
         },
       },
